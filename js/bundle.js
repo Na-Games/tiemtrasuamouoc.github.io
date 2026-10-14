@@ -60,7 +60,7 @@
   var SHIFT_START_H = 10;
   var SHIFT_END_H = 22;
   var QUEUE_BASE = 5;
-  var START_MONEY = 1e10;
+  var START_MONEY = 4e5;
   var BASE_RENT = 4e4;
   var BASE_UTILITY = 28e3;
   var DAYS_PER_SEASON = 7;
