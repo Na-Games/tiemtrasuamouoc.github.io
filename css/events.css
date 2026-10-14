@@ -1,0 +1,48 @@
+/* Sự kiện đột xuất khi mở cửa: mất điện, kiểm tra */
+
+/* Lớp phủ nằm dưới hộp thoại (z 70) & không chặn thao tác (nút tạm dừng/cài đặt vẫn bấm được) */
+.ev-layer { position: absolute; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.supply-row, .equip-strip { display: flex; gap: 5px; margin: 5px 0; }
+.equip-strip { overflow-x: auto; max-width: 100%; padding-bottom: 3px; touch-action: pan-x; }
+.equip-chip { flex: 0 0 auto; border: 1px solid #c9b698; border-radius: 12px; padding: 4px 7px; background: #fff7e9; color: #65452d; font-size: 10px; white-space: nowrap; }
+.equip-chip b { color: #8a7156; font-size: 9px; }
+.equip-chip.running { background: #e8f4c8; border-color: #748f42; }
+.equip-chip.running b { color: #386e24; }
+.supply-btn { flex: 1; border: 1px solid #c9b698; border-radius: 10px; padding: 4px 8px; background: #fff7e9; font-size: 11px; color: #65452d; }
+.supply-btn small { display: inline-block; margin-left: 5px; font-size: 9px; }
+.supply-btn.added { background: #e8f4c8; border-color: #748f42; }
+.supply-btn:disabled { opacity: .75; }
+.ev-dark { position: absolute; inset: 0; opacity: 0; transition: opacity .35s ease; }
+.ev-off .ev-dark { opacity: 1; background: radial-gradient(ellipse at 50% 55%, rgba(6, 8, 24, .55) 0%, rgba(4, 6, 18, .8) 100%); }
+.ev-gen1 .ev-dark { opacity: 1; background: rgba(255, 170, 40, .07); box-shadow: inset 0 0 60px rgba(255, 160, 30, .25); }
+.ev-halt .ev-dark { opacity: 1; background: rgba(120, 20, 20, .16); box-shadow: inset 0 0 50px rgba(200, 40, 40, .35); }
+.ev-flick .ev-dark { opacity: 1; background: rgba(4, 6, 18, .78); animation: evFlicker .32s steps(2, end) infinite; }
+@keyframes evFlicker { 0% { opacity: 1; } 50% { opacity: .05; } 100% { opacity: .85; } }
+.ev-badge { position: absolute; left: 50%; top: calc(96px + var(--safe-t, 0px)); transform: translateX(-50%); max-width: 92%; padding: 7px 14px; border-radius: 999px; font-weight: 800; font-size: 13px; color: #fff3b0; background: rgba(12, 14, 34, .82); border: 1.5px solid rgba(255, 224, 120, .7); box-shadow: 0 0 16px rgba(255, 214, 80, .45); text-align: center; white-space: nowrap; animation: evPulse 1s ease-in-out infinite; }
+.ev-halt .ev-badge { color: #ffd6d6; background: rgba(90, 14, 14, .85); border-color: rgba(255, 120, 120, .8); box-shadow: 0 0 16px rgba(255, 80, 80, .45); }
+@keyframes evPulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
+/* Máy móc tắt khi mất điện */
+.ev-off .sealer, .ev-off .disps, .ev-gen1 .disps { filter: grayscale(.9) brightness(.6); }
+.ev-off .sealer .sl-led { opacity: .15; }
+
+/* Topping / hương / trà sắp hết hạn hôm nay */
+.tray.exp-soon::after, .fbtn.exp-soon::after { content: '⏳'; position: absolute; left: 1px; bottom: 0; font-size: 11px; line-height: 1; pointer-events: none; }
+.fbtn { position: relative; }
+
+/* Hộp thoại kiểm tra */
+.ev-modal .ev-ico { font-size: 46px; text-align: center; line-height: 1.1; padding-top: 6px; }
+.ev-modal .m-text { margin: 4px 0 10px; }
+.ev-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.ev-row { display: flex; gap: 9px; align-items: flex-start; padding: 8px 10px; border-radius: 12px; background: var(--card2); border: 1.5px solid transparent; }
+.ev-row i { font-style: normal; font-size: 18px; line-height: 1.2; }
+.ev-row b { display: block; font-size: 13.5px; }
+.ev-row small { display: block; font-size: 12px; opacity: .8; }
+.ev-row.ok { border-color: rgba(60, 170, 90, .45); } .ev-row.warn { border-color: rgba(240, 150, 40, .6); } .ev-row.bad { border-color: rgba(220, 60, 60, .6); }
+.ev-verdict { text-align: center; font-weight: 800; font-size: 14px; padding: 9px 10px; border-radius: 12px; margin: 6px 0; }
+.ev-verdict.ok { background: rgba(60, 170, 90, .18); } .ev-verdict.warn { background: rgba(240, 150, 40, .2); } .ev-verdict.bad { background: rgba(220, 60, 60, .18); }
+.ev-tip { font-size: 12px; opacity: .85; text-align: center; margin: 2px 0 8px; }
+
+/* Ghi chú hỏng hàng cuối ngày */
+.exp-note { margin: 6px 0; padding: 8px 10px; border-radius: 12px; background: rgba(240, 150, 40, .16); border: 1.5px solid rgba(240, 150, 40, .5); font-weight: 700; font-size: 12.5px; }
+.exp-note small { display: block; font-weight: 500; opacity: .85; margin-top: 2px; }

@@ -1,0 +1,11 @@
+{
+  "name": "Tiệm Trà Mơ Ước",
+  "short_name": "Tiệm Trà",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#fdf3e4",
+  "theme_color": "#fdf3e4",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

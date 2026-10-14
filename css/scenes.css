@@ -1,0 +1,92 @@
+/* ======================================================================
+   Bối cảnh màn bán hàng theo địa điểm + thanh nhân viên
+   ====================================================================== */
+.sell { background: #D8BC96; }
+.sell-scene { position: absolute; left: 0; right: 0; top: 0; height: 216px; z-index: 0; overflow: hidden; pointer-events: none; border-bottom: 0; }
+.sell-scene::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: linear-gradient(rgba(216, 188, 150, 0), #D8BC96); }
+.sell-scene svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; transition: filter 1.6s; }
+.sell-scene[data-tod="morning"] { background: linear-gradient(#fde7c4, #ffd6b8 55%, #d4ecf6); }
+.sell-scene[data-tod="day"] { background: linear-gradient(#8fd3f3, #c9ecfa 60%, #fdf3d9); }
+.sell-scene[data-tod="dusk"] { background: linear-gradient(#6a78b6, #ef8f7a 58%, #ffd29a); }
+.sell-scene[data-tod="night"] { background: linear-gradient(#18244f, #34428a 60%, #6670ad); }
+.sell-scene[data-tod="morning"] svg { filter: brightness(1.04) saturate(1.05); }
+.sell-scene[data-tod="dusk"] svg { filter: sepia(.35) saturate(1.35) brightness(.9); }
+.sell-scene[data-tod="night"] svg { filter: brightness(.5) saturate(.9) hue-rotate(12deg); }
+.sell-scene[data-wx="cloudy"] svg, .sell-scene[data-wx="rain"] svg { filter: grayscale(.25) brightness(.92); }
+.sell-scene[data-wx="rain"] { background: linear-gradient(#8c9aab, #b7c3cf 60%, #d9dfe4); }
+.sell-scene[data-wx="cold"]::before { content: ''; position: absolute; inset: 0; z-index: 3; background: linear-gradient(rgba(160, 200, 255, .22), rgba(255, 255, 255, .22)); }
+.sc-sun { position: absolute; right: 9%; top: 8px; z-index: 1; font-size: 30px; line-height: 1; animation: scSun 6s ease-in-out infinite; }
+.sc-sun.dusk { top: 78px; right: 14%; font-size: 34px; } .sc-sun.moon { right: 12%; top: 10px; filter: drop-shadow(0 0 10px #fff6c8); }
+.sell-scene[data-wx="hot"] .sc-sun { filter: drop-shadow(0 0 16px #ffb347); font-size: 36px; }
+.sell-scene[data-wx="rain"] .sc-sun { opacity: .25; }
+@keyframes scSun { 50% { transform: scale(1.08); } }
+.sc-clouds i { position: absolute; font-style: normal; font-size: 30px; opacity: .85; z-index: 1; animation: scCloud 60s linear infinite; }
+.sc-clouds i:nth-child(1) { top: 6px; left: -14%; } .sc-clouds i:nth-child(2) { top: 40px; left: -30%; font-size: 22px; animation-duration: 90s; animation-delay: -40s; }
+.sell-scene[data-tod="night"] .sc-clouds i { opacity: .25; }
+@keyframes scCloud { to { transform: translateX(150vw); } }
+.sc-rain { position: absolute; inset: 0; z-index: 3; overflow: hidden; }
+.sc-rain i { position: absolute; top: -16px; width: 1.5px; height: 16px; background: rgba(255, 255, 255, .75); transform: rotate(12deg); animation: scRain .65s linear infinite; }
+@keyframes scRain { to { transform: translate(-22px, 230px) rotate(12deg); } }
+
+/* trang bị đã mua hiện trong cảnh */
+.sc-eq { position: absolute; z-index: 2; line-height: 1; font-style: normal; }
+.sc-eq.mascot { left: 6px; bottom: 30px; font-size: 30px; animation: scBounce 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+.sc-eq.led { left: 10px; top: 8px; padding: 2px 7px; border-radius: 5px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #fff; background: #2b1d3a; border: 1.5px solid #6ee7ff; box-shadow: 0 0 8px #6ee7ff; text-shadow: 0 0 6px #6ee7ff; animation: scNeon 2.4s steps(1) infinite; }
+.sc-eq.moto { bottom: 30px; left: -8%; font-size: 22px; animation: scMoto 14s linear infinite; }
+.sc-eq.ac { left: 46%; top: 12px; font-size: 16px; opacity: .8; animation: scAc 3s ease-in-out infinite; }
+.sc-eq.like { right: 20%; bottom: 40px; font-size: 14px; animation: scLike 3.2s ease-in infinite; } .sc-eq.like.l2 { right: 26%; animation-delay: 1.4s; }
+.sc-eq.guard { right: 8px; bottom: 30px; font-size: 26px; }
+@keyframes scBounce { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-5px) rotate(3deg); } }
+@keyframes scNeon { 0%, 90%, 100% { opacity: 1; } 94% { opacity: .45; } }
+@keyframes scMoto { to { transform: translateX(120vw); } }
+@keyframes scAc { 50% { transform: translateY(6px); opacity: .4; } }
+@keyframes scLike { 0% { transform: translateY(0) scale(.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-60px) scale(1.1); opacity: 0; } }
+
+/* giao diện nằm trên cảnh */
+.sell > .queue-row, .sell > .cust-zone, .sell > .hint, .sell > .shelf, .sell > .work, .sell > .foot { position: relative; z-index: 2; }
+.sell > .hint { align-self: stretch; margin: 0 -2px; padding: 0 8px; border-radius: 9px; background: rgba(255, 250, 240, .78); }
+.sell[data-night="1"] .hint { background: rgba(40, 36, 70, .6); color: #f3e9ff; }
+
+/* thanh nhân viên bên phải tiêu đề QUẦY TRÀ */
+.shelf-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 28px; }
+.shelf-head .tag-w { flex: none; }
+.staff-strip { display: flex; gap: 4px; align-items: center; justify-content: flex-end; flex-wrap: nowrap; min-width: 0; overflow: hidden; }
+.stf { position: relative; flex: none; width: 27px; height: 27px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; line-height: 1; background: var(--card2); box-shadow: 0 1px 3px rgba(60, 35, 10, .25); border: 0; padding: 0; }
+.stf::before { content: ''; position: absolute; inset: -2px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p, 0) * 1%), rgba(120, 90, 60, .22) 0); -webkit-mask: radial-gradient(circle, transparent 11px, #000 12px); mask: radial-gradient(circle, transparent 11px, #000 12px); opacity: 0; transition: opacity .2s; }
+.stf.work::before { opacity: 1; } .stf.work { animation: stfWork .5s ease-in-out infinite; }
+.stf.idle { opacity: .85; } .stf.sulk { filter: grayscale(.7); }
+.stf b { position: absolute; right: -3px; bottom: -3px; font-size: 9px; line-height: 1; }
+@keyframes stfWork { 50% { transform: translateY(-2px); } }
+@media (max-height: 800px) { .sell-scene { height: 190px; } }
+@media (prefers-reduced-motion: reduce) { .sc-sun, .sc-clouds i, .sc-rain i, .sc-eq, .stf.work { animation: none; } }
+
+.stf.tip::after { content: attr(data-tip); position: absolute; right: 0; bottom: calc(100% + 6px); white-space: nowrap; z-index: 20; padding: 3px 8px; border-radius: 7px; font-size: 11px; font-weight: 600; color: #fff; background: #3a2a1e; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.staff-strip { overflow: visible; }
+
+/* dải cảnh nhìn rõ: chừa khoảng trống dưới hàng khách chờ để thấy địa danh, bong bóng order hơi trong suốt */
+.sell-scene { height: 168px; }
+.sell-scene svg { height: 168px; }
+.sell > .queue-row { margin-bottom: 44px; }
+.sell .bubble { background: rgba(255, 252, 246, .9); }
+@media (max-height: 800px) { .sell-scene, .sell-scene svg { height: 140px; } .sell > .queue-row { margin-bottom: 28px; } }
+@media (max-height: 690px) { .sell-scene, .sell-scene svg { height: 110px; } .sell > .queue-row { margin-bottom: 12px; } }
+/* Keep the counter scrollable on short phones and respect directional sprites. */
+.sell { height: auto; min-height: 100%; overflow: visible; padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+.sell > .foot { flex: none; padding: 4px 0 8px; }
+.shelf-row { grid-template-columns: auto minmax(0, 1fr); gap: 3px; margin-top: 0; padding: 0; }
+.shelf-row::after { margin-top: -4px; }
+.shelf .stacks { gap: 3px; }
+
+.sc-eq.moto { left: auto; right: -12%; animation: scMotoForward 14s linear infinite; }
+@keyframes scMotoForward { to { transform: translateX(-120vw); } }
+.sc-clouds { position: absolute; inset: 0; }
+.sc-clouds i { animation-name: scCloudForward; }
+@keyframes scCloudForward { from { transform: translateX(0); } to { transform: translateX(650px); } }
+.sell-scene::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 80% 10%, #fff8 0, transparent 52%); animation: sceneGlow 8s ease-in-out infinite; }
+@keyframes sceneGlow { 50% { opacity: .45; } }
+.staff-strip .staff-sprite { width: 26px; height: 26px; border-radius: 50%; }
+.sc-av { width: 54px; height: 54px; flex: none; padding: 3px; border-radius: 16px; background: linear-gradient(135deg,#ffe2c9,#ffe7f0); overflow: hidden; }
+.sc-av .sale-art { width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) { .sc-eq.moto, .sc-clouds i, .sell-scene::before { animation: none; } }
+.app[data-phase="sell"] .view { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.sell > .foot { position: sticky; bottom: 0; z-index: 8; background: #D8BC96; border-radius: 10px; }

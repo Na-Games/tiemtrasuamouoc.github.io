@@ -1,0 +1,76 @@
+/* Bản đồ khởi nghiệp + chia sẻ trò chơi */
+/* ===== Bản đồ: đất đỏ cờ, sao vàng, biển nổi bật ===== */
+.vmap { background: linear-gradient(#2f8fb8, #0d3a6b); border: 4px solid var(--yellow); box-shadow: inset 0 0 26px rgba(4, 30, 60, .55), 0 0 0 2px var(--brown2), var(--sh-sm); }
+.vmap::after { background: radial-gradient(ellipse at center, transparent 50%, rgba(4, 24, 52, .5) 100%); }
+.vmap .vnb { fill: #eadfc6; }
+.vmap .vnb2 { fill: #eadfc6; stroke: #b9a77f; }
+.vmap .vsea { fill: url(#vsg); }
+.vmap .vwv { stroke: #bfeaf7; stroke-width: .3; opacity: .5; }
+.vmap .vwvm { animation: vmWave 4.5s linear infinite; }
+.vmap .vglow { stroke: #ffcd00; stroke-width: 2.2; opacity: .3; }
+.vmap svg .land { fill: url(#vfl); stroke: #ffcd00; stroke-width: .55; filter: drop-shadow(0 .5px .8px rgba(60, 0, 0, .55)); }
+.vmap svg .land.isl-l { stroke-width: .35; }
+.vmap .river { stroke: #ffd9a8; opacity: .9; }
+.vmap .river.dim { opacity: .5; }
+.vmap .mts { fill: #8f100b; stroke: #ffb199; stroke-width: .2; }
+.vmap .isl circle { fill: #ffcd00; stroke: #b3150f; }
+/* chữ: trên biển trắng viền xanh đậm, trên đất vàng viền đỏ đậm, nước bạn be viền nâu */
+.vmap .vt { paint-order: stroke; stroke-linejoin: round; }
+.vmap .vt.sea { fill: #fff; stroke: #0d3a6b; stroke-width: .55; opacity: 1; }
+.vmap .vt.nb { fill: #6b5a3c; stroke: #eadfc6; stroke-width: .4; opacity: 1; }
+.vmap .vt.mt, .vmap .vt.rv { fill: #fff3c4; stroke: #8f100b; stroke-width: .5; }
+.vmap .cmp-r { fill: rgba(255, 255, 255, .88); stroke: #ffcd00; stroke-width: .5; }
+.vmap .cmp-n { fill: #da251d; } .vmap .cmp-e { fill: #0d3a6b; opacity: .6; } .vmap .cmp-t { fill: #fff; stroke: #0d3a6b; stroke-width: .5; }
+.vmap .scl path { stroke: #fff; } .vmap .scl text { fill: #fff; stroke: #0d3a6b; stroke-width: .5; }
+/* ngôi sao vàng */
+.vmap .vstar polygon { fill: #ffcd00; stroke: #b3150f; stroke-width: .35; stroke-linejoin: round; filter: drop-shadow(0 0 1.2px rgba(255, 205, 0, .9)); transform-origin: 0 0; animation: vmStar 3.2s ease-in-out infinite; }
+/* mây, thuyền, chim */
+.vmap .vcloud { fill: #fff; opacity: .55; pointer-events: none; }
+.vmap .vcloud.c1 { transform: translate(-12px, 70px); animation: vmCloud1 46s linear infinite; }
+.vmap .vcloud.c2 { transform: translate(-12px, 24px); animation: vmCloud2 62s linear infinite -20s; }
+.vmap .vboat > g { animation: vmBoat 14s ease-in-out infinite alternate; }
+.vmap .vboat.b2 > g { animation-duration: 11s; animation-delay: -4s; }
+.vmap .vboat .hull { fill: #5a2b1b; } .vmap .vboat .sail { fill: #fff; stroke: #fff; stroke-width: .25; }
+.vmap .vbird { fill: none; stroke: #fff; stroke-width: .3; stroke-linecap: round; opacity: .85; transform: translate(-12px, 52px); animation: vmBird 26s linear infinite; }
+.vmap .vcmp { transform-origin: 0 0; }
+.vmap .cmp-spin { transform-origin: 0 0; animation: vmCmp 9s ease-in-out infinite alternate; }
+/* cờ Hoàng Sa / Trường Sa */
+.vmap .vflag .pole { stroke: #fff; stroke-width: .3; fill: none; }
+.vmap .vflag rect { fill: #da251d; }
+.vmap .vflag polygon { fill: #ffcd00; }
+.vmap .vflag g { transform-box: fill-box; transform-origin: 0 50%; animation: vmFlag 1.6s ease-in-out infinite alternate; }
+/* ghim: nhún nhẹ + vòng sáng; ghim đang chọn nổi bật */
+.vmap .pin span::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid var(--pink); opacity: 0; animation: vmRing 3s ease-out infinite; }
+.vmap .pin:nth-of-type(2n) span::after { animation-delay: -1.2s; } .vmap .pin:nth-of-type(3n) span::after { animation-delay: -2.1s; }
+.vmap .pin span { animation: vmBob 2.8s ease-in-out infinite; }
+.vmap .pin:nth-of-type(2n) span { animation-delay: -.9s; } .vmap .pin:nth-of-type(3n) span { animation-delay: -1.8s; }
+.vmap .pin.on span { animation: vmBobOn 1.4s ease-in-out infinite; box-shadow: 0 0 0 3px rgba(255, 205, 0, .75), 0 2px 8px rgba(0, 0, 0, .5); }
+.vmap .pin.on span::after { display: none; }
+.vmap .pin small { box-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
+@keyframes vmWave { to { transform: translateX(7px); } }
+@keyframes vmStar { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.18) rotate(6deg); } }
+@keyframes vmCloud1 { to { transform: translate(120px, 70px); } }
+@keyframes vmCloud2 { to { transform: translate(120px, 24px); } }
+@keyframes vmBoat { 0% { transform: translate(-9px, 0) rotate(-3deg); } 50% { transform: translate(0, -.6px) rotate(3deg); } 100% { transform: translate(9px, 0) rotate(-3deg); } }
+@keyframes vmBird { 0% { transform: translate(-12px, 52px); } 50% { transform: translate(60px, 44px); } 100% { transform: translate(120px, 56px); } }
+@keyframes vmCmp { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+@keyframes vmFlag { from { transform: scaleX(1); } to { transform: scaleX(.8); } }
+@keyframes vmRing { 0% { transform: scale(.8); opacity: .7; } 60%, 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes vmBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes vmBobOn { 0%, 100% { transform: scale(1.18) translateY(0); } 50% { transform: scale(1.3) translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) {
+  .vmap .vwvm, .vmap .vstar polygon, .vmap .vcloud, .vmap .vboat > g, .vmap .vbird, .vmap .cmp-spin, .vmap .vflag g, .vmap .pin span, .vmap .pin span::after { animation: none; }
+  .vmap .vcloud.c1 { transform: translate(30px, 70px); } .vmap .vcloud.c2 { transform: translate(78px, 24px); } .vmap .vbird { transform: translate(60px, 50px); }
+}
+
+/* ===== Chia sẻ trò chơi ===== */
+.sharebox { background: var(--card2); border: 2px solid var(--pink-soft); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.sharebox h5 { margin: 0; font-size: 14px; font-weight: 800; color: var(--brown); }
+.sharebox p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
+.sharebox .sh-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.sharebox .sh-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px; padding: 6px 4px; border-radius: 12px; border: 2px solid var(--pink-soft); background: var(--card); color: var(--brown); font-size: 13px; font-weight: 700; cursor: pointer; }
+.sharebox .sh-btn i { font-style: normal; font-size: 18px; line-height: 1; }
+.sharebox .sh-btn:active { transform: scale(.95); }
+.sharebox .sh-btn.zalo { border-color: #0068ff; } .sharebox .sh-btn.fb { border-color: #1877f2; } .sharebox .sh-btn.x { border-color: #888; }
+.sharebox .sh-btn.tg { border-color: #2aabee; } .sharebox .sh-btn.tt { border-color: #25f4ee; } .sharebox .sh-btn.ig { border-color: #e1306c; }
+@media (max-width: 300px) { .sharebox .sh-grid { grid-template-columns: repeat(2, 1fr); } }

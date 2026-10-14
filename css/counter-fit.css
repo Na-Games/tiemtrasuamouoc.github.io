@@ -1,0 +1,132 @@
+/* Measured from the remaining viewport after HUD and Android safe areas. */
+.app[data-phase="sell"] .view.counter-view { overflow: hidden; }
+.sell { --counter-u: 5px; height: 100%; min-height: 0; overflow: hidden; padding: 4px 8px; padding-bottom: calc(4px + var(--safe-b)); gap: 3px; }
+.sell > .queue-row { height: calc(var(--counter-u) * 6); min-height: 0; margin: 0; padding: 2px 0; flex: none; }
+.sell .qav { width: calc(var(--counter-u) * 6 - 4px); height: calc(var(--counter-u) * 6 - 4px); }
+.sell .qav b { width: 80%; height: 80%; }
+.sell .cust-zone { height: max(72px, calc(var(--counter-u) * 12)); min-height: 0; max-height: none; flex: none; align-items: flex-end; }
+.sell .cust-av { width: 56px; height: 100%; }
+.sell .cust-av .face { width: 56px; height: 100%; }
+.sell .bubble { height: 100%; background: rgba(255, 252, 246, .34); border: 1px solid rgba(255,255,255,.45); border-radius: 17px; padding: 2px 5px; gap: 1px; backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); box-shadow: 0 2px 6px rgba(86,55,31,.08); }
+.sell .bubble .b-row { gap: 5px; }
+.sell .bubble .cup { width: 24px !important; height: 32px !important; margin-top: 0; }
+.sell .bubble .btxt { line-height: 1.22; text-shadow: 0 1px 2px rgba(255,252,246,.85); }
+.sell .bubble .pat { height: 10px; gap: 4px; }
+.sell .bubble .pat span { font-size: 8.5px; letter-spacing: .2px; }
+.sell .bubble .pat .bar { height: 6px; }
+.sell .bubble::before { display: none; }
+[data-theme="dem"] .sell .bubble { background: rgba(54,47,76,.45); }
+[data-theme="dem"] .sell .bubble .btxt { text-shadow: 0 1px 2px rgba(25,20,39,.9); }
+.sell .hint { height: calc(var(--counter-u) * 3); min-height: 0; line-height: calc(var(--counter-u) * 3); padding: 0 6px; margin: 0; font-size: 10px; }
+.sell .shelf { height: calc(var(--counter-u) * 18); flex: none; min-height: 0; padding: 2px 4px; border-bottom-width: 3px; }
+.sell .shelf-head { height: 22px; min-height: 0; }
+.sell .shelf-head .tag-w, .sell .work-l > .tag-w { font-size: 10px; padding: 0 7px; line-height: 16px; min-height: 0; border-width: 1px; }
+.sell .staff-strip .stf { width: 22px; height: 22px; }
+.sell .staff-strip .staff-sprite { width: 18px; height: 18px; }
+.sell .shelf-row { height: calc(100% - 22px); grid-template-rows: minmax(0,1fr) 4px; gap: 0 2px; margin: 0; padding: 0; }
+.sell .shelf-row::after { height: 4px; margin: 0; }
+.sell .stacks { height: 100%; gap: 1px; align-items: flex-end; }
+.sell .stack { width: 29px; height: 100%; padding: 0; gap: 0; }
+.sell .stack.big { width: 33px; }
+.sell .cupstack.image-stack.m { width: 25px; height: calc(var(--counter-u) * 7); }
+.sell .cupstack.image-stack.l { width: 30px; height: calc(var(--counter-u) * 9); }
+.sell .stack b { font-size: 11px; line-height: 13px; }
+.sell .stack .cnt { top: auto; bottom: calc(var(--counter-u) * 7 + 3px); right: 0; }
+.sell .stack.big .cnt { bottom: calc(var(--counter-u) * 9 + 3px); }
+.sell .disps, .sell .disp, .sell .jar.image-jar { height: 100%; min-height: 0; }
+.sell .disps { gap: 1px; }
+.sell .disp { margin: 0; }
+.sell .shelf .cnt { min-width: 15px; height: 15px; font-size: 9px; padding: 0 2px; }
+.sell .work { flex: none; min-height: 0; gap: 2px; }
+.sell .work-row { height: calc(var(--counter-u) * 22); gap: 5px; }
+.sell .work-l { height: 100%; gap: 2px; }
+.sell .work-row .board { height: calc(100% - 20px); min-height: 0; border-width: 3px; }
+.sell .cupslot { height: 100%; padding-bottom: 10px; }
+.sell .cupslot .cup { max-height: calc(var(--counter-u) * 22 - 34px); max-width: calc(var(--counter-u) * 16 - 20px); }
+.sell .board-txt { top: 25%; font-size: 13px; }
+.sell .sealer.image-sealer { height: calc(var(--counter-u) * 22 - 4px); width: calc(var(--counter-u) * 16); max-width: 90px; margin: 0; }
+.sell .supply-row { height: calc(var(--counter-u) * 5); margin: 0; gap: 4px; }
+.sell .supply-btn { padding: 1px 4px; font-size: 10px; }
+.sell .supply-btn small { font-size: 9px; margin-left: 3px; }
+.sell .upgrade-shortcut { flex: 0 0 34px; min-width: 34px; padding: 0; font-size: 17px; border-radius: 10px; }
+.sell .flav-row { height: calc(var(--counter-u) * 5); margin: 0; }
+.sell .flav-row:empty { display: none; }
+.sell .fbtn { height: 100%; width: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 1px 2px 0; }
+.sell .fbtn b { font-size: 14px; line-height: 15px; z-index: 1; }
+.sell .fbtn small { z-index: 1; display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 7px; line-height: 8px; color: #594033; }
+.sell .trays { height: calc(var(--counter-u) * 14); min-height: 0; grid-template-rows: repeat(2,minmax(0,1fr)); gap: 3px; padding: 4px; }
+.sell .tray { height: 100%; min-height: 0; aspect-ratio: auto; }
+.sell .tray.image-tray small { font-size: 8px; line-height: 10px; }
+.sell > .foot { height: calc(var(--counter-u) * 6); flex: none; position: relative; bottom: auto; margin: 0; padding: 0; background: none; }
+.sell .lobby-go { min-height: 0; height: 100%; padding: 2px 12px; font-size: 12px; }
+.sell-scene, .sell-scene svg { height: calc(var(--counter-u) * 26); }
+.fx-ice { position: fixed; width: 16px; height: 16px; font-size: 16px; line-height: 1; pointer-events: none; filter: drop-shadow(0 1px 2px #5588aa66); }
+.fx-sugar-stream { position: fixed; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.fx-sugar-stream path { fill: none; stroke-linecap: round; }
+.syrup-shadow { stroke: #98601e; stroke-width: 7px; opacity: .4; }
+.syrup-body { stroke: #dfa33b; stroke-width: 5px; }
+.syrup-gloss { stroke: #ffe3a0; stroke-width: 1.5px; }
+.c-sugar { animation: syrupMix 1.1s ease-out both; }
+@keyframes syrupMix { from { opacity: .65; } to { opacity: .12; } }
+.sell .qav.genz-working { transform: translateY(-2px); filter: drop-shadow(0 0 5px #71ca8a); }
+.sell .genz-order-status { align-self: flex-start; color: #277942; font-size: 9px; font-weight: 800; line-height: 11px; padding: 0 5px; border-radius: 8px; background: #e3f5e6dd; animation: genzPulse 1s ease-in-out infinite alternate; }
+@keyframes genzPulse { to { box-shadow: 0 0 7px #72ca8a99; } }
+.sell .genz-job { position: absolute; right: -3px; bottom: -3px; width: 17px; height: 17px; z-index: 4; display: grid; place-items: center; border: 1px solid white; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px #4432; }
+.sell .genz-job b { font-size: 9px; line-height: 1; }
+.sell .genz-job > b { width: auto; height: auto; position: static; border-radius: 0; background: none; box-shadow: none; outline: 0; }
+.sell .genz-job i { position: absolute; inset: -2px; border-radius: 50%; background: conic-gradient(#48b86b var(--job-progress),#e6e1d7 0); z-index: -1; }
+.counter-upgrade-modal .modal-body { max-height: min(72vh, 560px); overflow-y: auto; }
+.upgrade-list { display: grid; gap: 7px; }
+.upgrade-item { width: 100%; min-height: 52px; display: grid; grid-template-columns: 34px minmax(0,1fr) 18px; align-items: center; gap: 8px; text-align: left; padding: 7px 9px; border: 1px solid var(--line); border-radius: 12px; background: var(--card2); color: var(--brown); }
+.upgrade-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--pink-soft); font-size: 19px; }
+.upgrade-item > span:nth-child(2) { min-width: 0; }
+.upgrade-item b, .upgrade-item small { display: block; }
+.upgrade-item b { font-size: 12px; }
+.upgrade-item small { margin-top: 2px; font-size: 10px; line-height: 1.25; color: var(--muted); }
+.upgrade-arrow { font-size: 22px; text-align: center; }
+.staff-preview-board { position: relative; height: 156px; display: flex; align-items: center; justify-content: center; gap: 32px; margin: 12px 0; border-radius: 18px; background: repeating-linear-gradient(90deg,#eeddbd 0 20px,#f5e6cb 20px 40px); overflow: hidden; }
+.staff-order-cup { position: relative; min-width: 74px; height: 130px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 12px; }
+.staff-preview-customer { display: grid; place-items: center; width: 58px; height: 70px; font-size: 42px; }
+.staff-preview-customer .customer-sprite { width: 58px; height: 70px; }
+.staff-job-status { display: block; margin-bottom: 8px; text-align: center; font-size: 13px; color: var(--green); }
+.staff-job-progress { height: 7px; }
+.staff-job-progress i { background: linear-gradient(90deg,#76ad70,#b9cf6e); }
+.staff-preview-stream { display: none; position: absolute; top: 6px; bottom: 48px; left: calc(50% - 3px); width: 6px; border-radius: 5px; background: linear-gradient(90deg,var(--tea),#fff9,var(--tea)); transform-origin: top; animation: staffFlow .2s ease-in-out infinite alternate; }
+.staff-order-cup[data-step="pour"] .staff-preview-stream { display: block; }
+.staff-preview-drop { display: none; position: absolute; top: 15px; left: calc(50% - 6px); color: #e58b48; font-size: 16px; animation: staffDrop .2s ease-in infinite; }
+.staff-order-cup[data-step^="top:"] .staff-preview-drop, .staff-order-cup[data-step="flavor"] .staff-preview-drop, .staff-order-cup[data-step="ice"] .staff-preview-drop, .staff-order-cup[data-step="sugar"] .staff-preview-drop { display: block; }
+.staff-order-cup[data-step="cup"] .cup { animation: staffCupIn .2s ease-out; }
+.staff-order-cup[data-step="seal"] .cup { animation: staffCupPress .2s ease-in-out; }
+.staff-order-cup[data-step="serve"] .cup { animation: staffCupServe .2s ease-in forwards; }
+@keyframes staffFlow { to { transform: scaleX(.7); } }
+@keyframes staffDrop { to { transform: translateY(65px) rotate(100deg); opacity: 0; } }
+@keyframes staffCupIn { from { transform: translateY(-32px) scale(.6); opacity: .3; } }
+@keyframes staffCupPress { 50% { transform: scale(1.06,.92); } }
+@keyframes staffCupServe { to { transform: translate(48px,-15px) scale(.6); opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .staff-order-cup .cup, .staff-preview-stream, .staff-preview-drop, .sell .genz-order-status { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .c-sugar { animation: none; } }
+/* Short landscape screens use two columns so order text still has room. */
+@media (max-height: 480px) and (min-width: 480px) {
+  .app[data-phase="sell"] { max-width: none; }
+  .sell { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); grid-template-rows: 32px minmax(0,1fr) 30px; gap: 4px; }
+  .sell > .queue-row { grid-column: 1; grid-row: 1; height: 32px; }
+  .sell .qav { width: 28px; height: 28px; }
+  .sell .cust-zone { grid-column: 1; grid-row: 2; height: calc(100% - 18px); }
+  .sell .cust-av { width: 44px; }
+  .sell .cust-av .face { width: 44px; max-height: 72px; }
+  .sell .hint { grid-column: 1; grid-row: 2; align-self: end; height: 16px; line-height: 16px; }
+  .sell .shelf { grid-column: 2; grid-row: 1; height: 66px; }
+  .sell .cupstack.image-stack.m { height: 22px; }
+  .sell .cupstack.image-stack.l { height: 28px; }
+  .sell .stack .cnt { bottom: 26px; }
+  .sell .stack.big .cnt { bottom: 32px; }
+  .sell .work { grid-column: 2; grid-row: 2 / 4; margin-top: 34px; height: calc(100% - 34px); }
+  .sell .work-row { flex: 1; height: auto; min-height: 0; }
+  .sell .work-l { min-height: 0; }
+  .sell .cupslot .cup { max-height: 100%; max-width: 34px; }
+  .sell .sealer.image-sealer { height: 100%; width: 48px; }
+  .sell .supply-row { flex: none; height: 22px; }
+  .sell .flav-row { flex: none; height: 23px; }
+  .sell .trays { flex: none; height: 52px; }
+  .sell > .foot { grid-column: 1; grid-row: 3; height: 30px; }
+}

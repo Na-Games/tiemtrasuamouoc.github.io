@@ -1,0 +1,5 @@
+/* Counter effects sit below dialogs and follow the cup's coordinate system. */
+#brewfx { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.app.modal-open #brewfx, .app.modal-open .fx { display: none; }
+.cup .cup-attached-lid { position: absolute; left: -3px; right: -3px; top: -6px; width: auto; z-index: 6; }
+.app[data-phase="sell"] .toasts { top: auto; bottom: calc(12px + var(--safe-b)); }

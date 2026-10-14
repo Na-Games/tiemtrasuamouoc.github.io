@@ -1,0 +1,218 @@
+/* ======================================================================
+   Màn bán hàng (bản Android): khung cố định, ly SVG, máy đóng nắp lớn hơn,
+   nút phụ nhỏ lại, thanh rót mảnh, hiệu ứng rót trà
+   ====================================================================== */
+
+/* ---------- Hình sprite đã tách riêng ---------- */
+.sale-art { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.disp .jar .sale-art, .tray .pile .sale-art { object-position: center bottom; }
+
+/* ---------- Khung cố định: chữ đổi không làm màn hình rung ---------- */
+.sell { height: 100%; overflow: hidden; }
+.queue-row { height: 44px; min-height: 44px; flex: none; align-items: center; }
+.cust-zone { height: 108px; min-height: 108px; max-height: 108px; flex: none; align-items: center; overflow: visible; }
+.cust-av { width: 66px; height: 86px; flex: none; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+.cust-av .face { width: 66px; height: 80px; animation: none; }
+.cust-av .face .sale-art { object-position: center bottom; }
+.cust-av .idle { font-size: 40px; line-height: 1; }
+.bubble { height: 102px; margin: 0; padding: 6px 10px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+.bubble::after { display: none; }
+.bubble .b-row { flex: 1; min-height: 0; align-items: center; overflow: hidden; }
+.bubble .b-row > div:last-child { min-width: 0; }
+.bubble .btxt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 12.5px; line-height: 1.3; max-height: 3.9em; margin: 2px 0 0; }
+.bubble .btxt.dim { -webkit-line-clamp: 2; }
+.bubble .pat { flex: none; margin: 0; height: 14px; }
+.hint { height: 18px; min-height: 18px; flex: none; display: block !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 18px; }
+.hint:empty::before { content: ''; }
+.cust-zone .atag { white-space: nowrap; }
+
+/* ---------- Ly SVG ---------- */
+.cup { position: relative; flex: none; filter: drop-shadow(0 3px 3px rgba(60, 35, 10, .25)); }
+.cup .cup-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.cup .c-stamp { position: absolute; left: 50%; top: 42%; transform: translate(-50%, 0); z-index: 3; opacity: .95; pointer-events: none; }
+.cup .c-surf { transition: opacity .15s; }
+.c-lidg.drop { animation: cupLidDrop var(--seal-ms, 800ms) cubic-bezier(.4, 0, .9, .6) both; }
+@keyframes cupLidDrop {
+  0% { transform: translateY(-46px); opacity: 0; }
+  22% { transform: translateY(-34px); opacity: 1; }
+  72% { transform: translateY(0); }
+  84% { transform: translateY(2.5px); }
+  100% { transform: translateY(0); }
+}
+.cup.ready .c-strawg { animation: cupStrawIn .35s ease-out both; }
+@keyframes cupStrawIn { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cup.sealing { animation: none; }
+.cupslot { overflow: visible; }
+.cupslot .cup { transition: none; }
+
+/* ---------- Máy đóng nắp (to hơn 150%), điện thoại & thùng rác (nhỏ còn một nửa) ---------- */
+.sealer.image-sealer { width: 90px; height: 123px; flex: none; margin-bottom: 0; }
+.sealer.image-sealer .sl-led { top: 38%; left: 14%; right: 16%; font-size: 7px; }
+.work-side { gap: 10px; }
+.work-side .phone, .work-side .trash { position: relative; }
+.work-side .phone { width: 20px; height: 20px; border-radius: 6px; font-size: 10px; }
+.work-side .phone b { min-width: 14px; height: 14px; top: -6px; right: -6px; font-size: 8px; }
+.work-side .trash { width: 22px; height: 22px; border-radius: 6px; font-size: 11px; }
+.work-side .phone::after, .work-side .trash::after { content: ''; position: absolute; inset: -9px; }
+@media (max-height: 800px) {
+  .sealer.image-sealer { width: 78px; height: 106px; }
+}
+@media (max-height: 690px) {
+  .sealer.image-sealer { width: 66px; height: 90px; }
+}
+
+/* ---------- Thanh chạy rót: mảnh, bo tròn, có vùng vàng ---------- */
+.pourbar { left: 12px; right: 12px; bottom: 9px; height: 8px; border-radius: 99px; background: rgba(74, 54, 38, .55); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .35); overflow: hidden; opacity: .6; }
+.pourbar.on { opacity: 1; }
+.pourbar .pb-zone { background: rgba(255, 214, 92, .9); border: 0; box-shadow: 0 0 6px rgba(255, 214, 92, .8); }
+.pourbar i { border-radius: 99px; background: linear-gradient(90deg, #9bd9a8, #4fb872); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45); }
+.pourbar i.ok { background: linear-gradient(90deg, #ffe08a, #f7b733); }
+.pourbar i.over { background: linear-gradient(90deg, #ff9aa8, #e8416a); }
+
+/* ---------- Hiệu ứng rót trà: dòng trà trong, có vệt sáng, gợn sóng ở miệng ly ---------- */
+.stream { width: 7px; margin-left: 0; border-radius: 4px; opacity: .96; box-shadow: none;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) calc(var(--rim, 50%) - 3%), rgba(255, 255, 255, .34) var(--rim, 50%)), linear-gradient(90deg, rgba(255, 255, 255, .6) 0, rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, .14) 100%);
+  background-size: 100% 100%; animation: none; }
+.stream::before { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: .5;
+  background-image: repeating-linear-gradient(180deg, rgba(255, 255, 255, .45) 0 3px, rgba(255, 255, 255, 0) 3px 12px); background-size: 100% 24px; animation: streamFlow .38s linear infinite; }
+.stream::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 28px; height: 10px; margin-left: -14px; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, .8) 0, rgba(255, 255, 255, .25) 55%, rgba(255, 255, 255, 0) 72%); animation: streamRipple .5s ease-in-out infinite; }
+@keyframes streamFlow { to { background-position: 0 24px; } }
+@keyframes streamRipple { 50% { transform: scale(1.18, .8); opacity: .7; } }
+.disp.pouring .jar { animation: jarShake .5s ease-in-out infinite; }
+@keyframes jarShake { 50% { transform: rotate(-2deg) translateY(1px); } }
+
+@media (max-height: 800px) {
+  .cust-zone { height: 98px; min-height: 98px; max-height: 98px; } .bubble { height: 92px; }
+  .cust-av { height: 80px; } .cust-av .face { height: 74px; }
+}
+@media (max-height: 690px) {
+  .cust-zone { display: flex; height: 88px; min-height: 88px; max-height: 88px; } .bubble { height: 82px; }
+  .bubble .btxt { -webkit-line-clamp: 2; max-height: 2.6em; }
+}
+@media (max-height: 800px) {
+  .bubble .btxt { font-size: 11.5px; line-height: 1.25; max-height: 3.75em; }
+  .bubble .atag { font-size: 10.5px; }
+}
+
+/* Nút chọn ảnh từ thư viện: input file trong suốt phủ kín nút */
+.file-btn { position: relative; overflow: hidden; cursor: pointer; }
+.file-btn input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 0; }
+
+/* ---------- Giao ly cho khách: khách nhận ly, cảm ơn, rồi khách mới bước vào ---------- */
+.cust-av .face.thanks { animation: custThanks .7s cubic-bezier(.3, 1.4, .5, 1) both; }
+.cust-av .face.sad { animation: custSad .6s ease both; }
+@keyframes custThanks { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-12px) scale(1.08, .94); } 55% { transform: translateY(0) scale(.96, 1.05); } 75% { transform: translateY(-5px) scale(1.03); } 100% { transform: none; } }
+@keyframes custSad { 0%, 100% { transform: none; } 20% { transform: translateX(-4px) rotate(-3deg); } 45% { transform: translateX(4px) rotate(3deg); } 70% { transform: translateX(-2px); } }
+.thanks-msg { display: flex; align-items: center; gap: 10px; height: 100%; animation: thanksIn .25s ease-out both; }
+.thanks-emo { font-size: 34px; line-height: 1; animation: thanksPop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.thanks-msg b { display: block; font-size: 14px; font-weight: 700; } .thanks-msg small { display: block; color: #d9a441; font-size: 15px; letter-spacing: 1px; }
+@keyframes thanksIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes thanksPop { from { transform: scale(.2) rotate(-20deg); } to { transform: none; } }
+.cust-av.enter .face, .cust-av.enter .idle { animation: custEnter .42s cubic-bezier(.3, 1.2, .5, 1) both; }
+.bubble.enter { animation: bubbleEnter .38s ease-out both; }
+@keyframes custEnter { from { opacity: 0; transform: translateX(-22px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes bubbleEnter { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+#brewfx .fx-float { position: fixed; z-index: 3; transform: translateX(-50%); }
+
+/* dòng trà đi vào lòng ly: phần trong ly mờ nhẹ như nhìn qua thủy tinh, chạm mặt nước thì gợn sóng và bắn bọt */
+.stream::after { width: 34px; height: 12px; margin-left: -17px; bottom: -6px; }
+.stream { z-index: 7; }
+
+/* ---------- Quầy trà (v2): mỗi size một chồng ly, bình trà to hơn và sát nhau, số lượng bám vào bình ---------- */
+.shelf-row { grid-template-columns: auto minmax(0, 1fr); gap: 2px; align-items: end; }
+.stacks { gap: 0; flex: none; }
+.stack { width: 38px; padding: 0; }
+.stack.big { width: 38px; }
+.cupstack.image-stack.m { width: 36px; height: 72px; }
+.cupstack.image-stack.l { width: 33px; height: 78px; }
+.stack b { font-size: 14px; }
+.disps { gap: 0; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.disp { margin: 0 -1px; }
+.jar.image-jar { height: 88px; width: 100%; max-width: none; }
+.jar.image-jar .sale-art { object-position: center bottom; }
+.shelf .cnt { min-width: 18px; height: 18px; padding: 0 4px; font-size: 10.5px; border-width: 1.5px; }
+.disp .cnt { top: 4px; right: 1px; }
+.stack .cnt { top: 4px; right: -2px; }
+@media (max-width: 380px) { .jar.image-jar { height: 80px; } }
+@media (max-height: 800px) { .jar.image-jar { height: 74px; } .cupstack.image-stack.m { height: 62px; width: 31px; } .cupstack.image-stack.l { height: 68px; width: 29px; } .stack, .stack.big { width: 32px; } }
+@media (max-height: 690px) { .jar.image-jar { height: 62px; } }
+
+.toast.bump { animation: toastBump .25s ease; }
+@keyframes toastBump { 50% { transform: scale(1.04); } }
+.rej { position: absolute; top: 5px; right: 8px; z-index: 3; padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 600; color: var(--brown2); background: rgba(255, 255, 255, .85); border: 1px solid var(--line); }
+.rej:active { transform: scale(.94); }
+.bubble { position: relative; }
+
+/* ---------- Chồng ly SVG: M nhỏ, L lớn ---------- */
+.cupstack.image-stack.m { width: 38px; height: 66px; }
+.cupstack.image-stack.l { width: 46px; height: 80px; }
+.stack { width: 42px; } .stack.big { width: 48px; }
+.cupstack.image-stack .stack-svg { width: 100%; height: 100%; }
+@media (max-height: 800px) { .cupstack.image-stack.m { width: 32px; height: 56px; } .cupstack.image-stack.l { width: 39px; height: 68px; } .stack { width: 36px; } .stack.big { width: 42px; } }
+
+/* ---------- Dòng trà rót: thon dần, bóng mượt, bắn tia và gợn sóng ở mặt nước ---------- */
+.stream { width: 8px; margin-left: -.5px; border-radius: 0 0 4px 4px; opacity: 1; box-shadow: none; background-size: 100% 100%;
+  clip-path: polygon(8% 0, 92% 0, 78% 100%, 22% 100%);  }
+.stream::before, .stream::after { display: none; }
+.stream .st-gloss { position: absolute; left: 24%; top: 0; bottom: 0; width: 22%; border-radius: 3px; background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .35)); background-size: 100% 22px; animation: stGloss .5s linear infinite; }
+@keyframes stGloss { from { background-position: 0 0; opacity: .9; } 50% { opacity: .55; } to { background-position: 0 22px; opacity: .9; } }
+@keyframes streamSway { 0%, 100% { clip-path: polygon(8% 0, 92% 0, 78% 100%, 22% 100%); } 50% { clip-path: polygon(8% 0, 92% 0, 84% 100%, 16% 100%); } }
+.stream .st-spl { position: absolute; left: 50%; bottom: -3px; width: 0; height: 0; color: inherit; }
+.stream .st-spl i { position: absolute; left: -2px; bottom: 0; width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: inset -1px -1px 1px rgba(0, 0, 0, .18), 0 0 0 1px rgba(255, 255, 255, .45); opacity: 0; animation: stDrop .62s ease-out infinite; }
+.stream .st-spl i:nth-child(1) { --dx: -15px; --dy: -15px; animation-delay: 0s; }
+.stream .st-spl i:nth-child(2) { --dx: 14px; --dy: -17px; animation-delay: .12s; width: 4px; height: 4px; }
+.stream .st-spl i:nth-child(3) { --dx: -9px; --dy: -22px; animation-delay: .25s; width: 3px; height: 3px; }
+.stream .st-spl i:nth-child(4) { --dx: 9px; --dy: -23px; animation-delay: .37s; width: 3px; height: 3px; }
+.stream .st-spl i:nth-child(5) { --dx: 0; --dy: -26px; animation-delay: .5s; width: 3px; height: 3px; }
+@keyframes stDrop { 0% { transform: translate(0, 0) scale(.6); opacity: 0; } 15% { opacity: .95; } 55% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: .9; } 100% { transform: translate(calc(var(--dx) * 1.35), calc(var(--dy) * .35)) scale(.7); opacity: 0; } }
+.stream .st-ring { position: absolute; left: 50%; bottom: -4px; width: 30px; height: 9px; margin-left: -15px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .85); box-shadow: 0 0 5px rgba(255, 255, 255, .5); opacity: 0; animation: stRing .8s ease-out infinite; }
+.stream .st-ring.r2 { animation-delay: .4s; }
+@keyframes stRing { 0% { transform: scale(.25, .25); opacity: .95; } 100% { transform: scale(1.25, 1.1); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .stream, .stream .st-gloss, .stream .st-spl i, .stream .st-ring { animation: none; } }
+/* sửa: bỏ clip-path (cắt mất tia bắn và gợn sóng), thân dòng trà đậm viền hơn để nhìn rõ trên thớt gỗ */
+.stream { clip-path: none; width: 9px; border-radius: 4.5px 4.5px 6px 6px; animation: streamWobble .6s ease-in-out infinite;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) calc(var(--rim, 50%) - 3%), rgba(255, 255, 255, .3) var(--rim, 50%)),
+    linear-gradient(90deg, rgba(80, 45, 10, .34), rgba(80, 45, 10, 0) 34%, rgba(80, 45, 10, 0) 62%, rgba(80, 45, 10, .3)); }
+@keyframes streamWobble { 0%, 100% { transform-origin: 50% 0; filter: none; } 50% { filter: brightness(1.06); } }
+.stream .st-gloss { left: 26%; width: 20%; }
+
+/* Vòi rót nằm giữa đáy bình (đúng vị trí vòi trên hình), dòng trà chảy ra từ đây */
+.disp .image-tap { left: 50%; bottom: 0; width: 8px; height: 6px; transform: translateX(-50%); }
+
+/* Compact order card: reserve a separate row for the reject action. */
+.sell .cust-zone { height: 102px; min-height: 102px; max-height: 102px; align-items: flex-start; }
+.sell .bubble { height: 96px; border-radius: 20px; border: 1px solid rgba(180, 141, 101, .45); padding: 5px 8px; gap: 2px; box-shadow: 0 3px 8px rgba(80, 45, 20, .16); }
+.order-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; flex: none; min-height: 26px; }
+.order-head .atag { overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+.sell .rej { position: static; flex: none; min-height: 26px; padding: 3px 9px; background: linear-gradient(#e66561, #c74743); color: #fff; border: 1px solid #b93835; font-size: 11px; font-weight: 800; box-shadow: 0 2px 4px rgba(163, 44, 39, .22); }
+.sell .rej:focus-visible { outline: 3px solid #ffd54a; outline-offset: 2px; }
+.sell .bubble .b-row { gap: 6px; }
+.sell .bubble .b-row > div:last-child { flex: 1; height: 100%; overflow: hidden; }
+.sell .bubble .cup { width: 32px !important; height: 44px !important; }
+.sell .bubble .btxt { display: block; height: 100%; overflow-y: auto; max-height: none; font-size: 11.5px; line-height: 1.25; margin: 0; overscroll-behavior: contain; }
+.sell .bubble .pat { height: 12px; }
+@media (max-height: 800px) { .sell .cust-zone { height: 96px; min-height: 96px; max-height: 96px; } .sell .bubble { height: 90px; } }
+@media (max-height: 690px) { .sell .cust-zone { height: 90px; min-height: 90px; max-height: 90px; } .sell .bubble { height: 84px; } }
+
+/* Keep the jet and impact separate so droplets are never clipped by the jet. */
+.stream { width: 8px; margin: 0; background: none; clip-path: none; animation: none; overflow: visible; }
+.st-jet { position: absolute; inset: 0; background-color: var(--tea); border-radius: 3px; clip-path: polygon(5% 0, 95% 0, 72% 100%, 28% 100%);
+  background-image: linear-gradient(180deg, transparent calc(var(--rim) - 2%), rgba(255,255,255,.28) var(--rim)), linear-gradient(90deg, rgba(77,43,17,.25), rgba(255,255,255,.48) 30%, transparent 60%, rgba(77,43,17,.2)); }
+.st-jet::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 15px, rgba(255,255,255,.35) 17px, transparent 23px); background-size: 100% 28px; animation: teaFlow .26s linear infinite; }
+.stream .st-gloss { left: 26%; width: 18%; opacity: .65; }
+.st-impact { position: absolute; left: 50%; bottom: 0; width: 0; height: 0; transform: rotate(var(--impact-angle, 0deg)); }
+.stream .st-spl { bottom: 0; }
+.stream .st-spl i { width: 3px; height: 4px; animation-name: teaDroplet; animation-duration: .72s; }
+.stream .st-ring { width: 22px; height: 5px; bottom: -2px; margin-left: -11px; border-width: 1px; box-shadow: none; }
+.c-pour-bubbles { opacity: 0; fill: #fff; fill-opacity: .55; pointer-events: none; }
+.pouring-art .c-pour-bubbles { opacity: 1; }
+.pouring-art .tea-bubble { animation: teaBubble .85s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.pouring-art .tea-bubble:nth-child(2) { animation-delay: -.3s; }
+.pouring-art .tea-bubble:nth-child(3) { animation-delay: -.6s; }
+.pouring-art .c-surf { transform-box: fill-box; transform-origin: center; animation: teaSurface .7s ease-in-out infinite; }
+@keyframes teaFlow { to { background-position: 0 28px; } }
+@keyframes teaDroplet { 0% { opacity: 0; transform: translate(0, 0) scale(.5); } 15% { opacity: .8; } 48% { opacity: .7; transform: translate(calc(var(--dx) * .65), calc(var(--dy) * .45)) scale(.85); } 100% { opacity: 0; transform: translate(var(--dx), 4px) scale(.4); } }
+@keyframes teaBubble { 0% { opacity: 0; transform: translateY(6px) scale(.5); } 30% { opacity: .7; } 100% { opacity: 0; transform: translateY(-3px) scale(1.2); } }
+@keyframes teaSurface { 0%, 100% { transform: scaleY(.9) rotate(-1deg); } 50% { transform: scaleY(1.2) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) { .st-jet::after, .pouring-art .tea-bubble, .pouring-art .c-surf, .stream .st-spl i { animation: none; } }

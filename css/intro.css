@@ -1,0 +1,153 @@
+/* ======================================================================
+   Màn mở đầu (v3): tên tiệm → nút chơi ngay bên dưới, nền hoàng hôn sống động
+   ====================================================================== */
+.intro { background: linear-gradient(#f7cfc4 0, #fbe0cf 16%, #fdeedd 38%, #fdf3e4 60%, #f4e4cf 100%); overflow: hidden; }
+.intro::before { height: 15%; z-index: 1; background: repeating-linear-gradient(90deg, #f3e7dc 0 60px, #ece0d4 60px 62px), #f3e7dc; box-shadow: inset 0 8px 10px rgba(150, 110, 80, .12); }
+
+/* tia nắng xoay chậm sau tiêu đề */
+.in-rays { position: absolute; left: 50%; top: 24%; width: 150vmax; height: 150vmax; margin: -75vmax 0 0 -75vmax; z-index: 0; pointer-events: none; opacity: .5;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 236, 190, .55) 0 7deg, rgba(255, 236, 190, 0) 7deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .5) 14%, transparent 34%); mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .5) 14%, transparent 34%);
+  animation: inRays 60s linear infinite; }
+@keyframes inRays { to { transform: rotate(360deg); } }
+
+/* lớp hiệu ứng: bong bóng trân châu nổi lên, cánh hoa rơi */
+.in-fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.in-fx .bub { position: absolute; bottom: -24px; width: var(--s); height: var(--s); border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, .95) 0 14%, rgba(255, 190, 205, .55) 40%, rgba(255, 150, 175, .25) 70%); border: 1px solid rgba(255, 255, 255, .8);
+  animation: inBub var(--t) linear var(--d) infinite; }
+@keyframes inBub { 0% { transform: translate(0, 0) scale(.6); opacity: 0; } 10% { opacity: .9; } 50% { transform: translate(10px, -45vh) scale(1); } 90% { opacity: .7; } 100% { transform: translate(-8px, -105vh) scale(1.1); opacity: 0; } }
+.in-fx .pet { position: absolute; top: -28px; font-style: normal; font-size: 16px; opacity: 0; animation: inPet var(--t) ease-in-out var(--d) infinite; }
+@keyframes inPet { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: .9; } 50% { transform: translate(var(--x), 48vh) rotate(180deg); } 100% { transform: translate(calc(var(--x) * -.6), 104vh) rotate(420deg); opacity: .15; } }
+
+/* mây trôi ngang */
+.intro-sky .cloud { animation: inCloud 28s linear infinite; opacity: .8; }
+.intro-sky .c1 { left: -20%; top: 5%; font-size: 52px; }
+.intro-sky .c2 { left: -30%; top: 17%; font-size: 40px; animation-duration: 36s; animation-delay: -14s; right: auto; }
+.intro-sky .c3 { position: absolute; left: -25%; top: 29%; font-size: 34px; animation-duration: 44s; animation-delay: -30s; }
+@keyframes inCloud { from { transform: translateX(0); } to { transform: translateX(150vw); } }
+.intro-sky .star { animation: inStar 3.6s ease-in-out infinite; }
+@keyframes inStar { 0%, 100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.18) rotate(8deg); filter: drop-shadow(0 0 10px #ffe27a); } }
+
+/* tiêu đề + nút chơi ngay bên dưới */
+.in-aw { margin-top: clamp(28px, 5vh, 52px); }
+.intro-title { margin: 14px 0 0; font-size: clamp(32px, 9vw, 44px); line-height: 1.1; text-shadow: 0 2px 0 #fff, 0 0 18px rgba(255, 255, 255, .95), 0 6px 14px rgba(190, 90, 100, .25); animation: inTitle 3.6s ease-in-out infinite; }
+@keyframes inTitle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.intro-tag { margin: 8px 0 0; font-size: 13.5px; text-shadow: 0 1px 0 rgba(255, 255, 255, .9); }
+.intro-info { margin: 4px 0 0; font-size: 13px; }
+.intro .btn.big { margin-top: 14px; width: min(78%, 320px); animation: inPlay 2.2s ease-in-out infinite; }
+@keyframes inPlay { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); box-shadow: 0 4px 0 #b95a73, 0 12px 22px rgba(185, 90, 115, .4); } }
+.intro .link { margin: 6px 0 0; }
+
+/* nhân vật chính ở giữa màn hình: ly trà khổng lồ + hào quang */
+.in-hero { position: relative; z-index: 3; margin: auto 0; width: 190px; height: 170px; flex: none; display: grid; place-items: center; }
+.hero-glow { position: absolute; width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .95) 0, rgba(255, 220, 200, .65) 38%, rgba(255, 200, 190, 0) 70%); animation: heroGlow 3.4s ease-in-out infinite; }
+@keyframes heroGlow { 50% { transform: scale(1.12); opacity: .85; } }
+.hero-cup { position: relative; font-size: 104px; line-height: 1; filter: drop-shadow(0 10px 10px rgba(120, 60, 40, .25)); animation: heroCup 3.2s ease-in-out infinite; }
+@keyframes heroCup { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-9px) rotate(3deg); } }
+.hero-steam { position: absolute; font-size: 20px; opacity: 0; animation: heroSteam 3s ease-in infinite; }
+.hero-steam.s1 { left: 34%; top: 10%; } .hero-steam.s2 { left: 60%; top: 16%; animation-delay: 1s; } .hero-steam.s3 { left: 48%; top: 6%; animation-delay: 2s; }
+@keyframes heroSteam { 0% { transform: translateY(14px) scale(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-34px) scale(1.15); opacity: 0; } }
+
+/* quầy ở phía dưới */
+.in-counter { margin-top: 0; padding-bottom: 2px; background: linear-gradient(transparent calc(100% - 14px), #c99a6b calc(100% - 14px)); }
+.in-cups span, .in-plant { animation: none; }
+.in-cups span { display: inline-block; animation: bob 3s ease-in-out infinite; }
+.in-front { height: clamp(46px, 7vh, 66px); }
+.in-corner { bottom: calc(10px + var(--safe-b)); }
+.intro .ver { z-index: 4; }
+@media (prefers-reduced-motion: reduce) {
+  .in-rays, .in-fx .bub, .in-fx .pet, .intro-sky .cloud, .intro-title, .hero-glow, .hero-cup, .hero-steam, .intro .btn.big { animation: none; }
+}
+@media (max-height: 700px) { .in-hero { width: 140px; height: 120px; } .hero-cup { font-size: 76px; } .hero-glow { width: 140px; height: 140px; } .in-aw { height: 70px; } }
+.intro .ver { left: 50%; transform: translateX(-50%); bottom: calc(14px + var(--safe-b)); }
+/* sàn nằm dưới quầy, không chen sau lưng quầy */
+.intro::before { height: 74px; }
+.in-front { margin-bottom: 74px; }
+
+/* "Hướng dẫn": nút nhỏ ở dưới cùng, tách xa nút chơi để không bấm nhầm */
+.intro .link { position: absolute; left: 50%; bottom: calc(46px + var(--safe-b)); transform: translateX(-50%); margin: 0; padding: 7px 18px; z-index: 5; font-size: 13.5px; text-decoration: none; border-radius: 99px; background: rgba(255, 255, 255, .72); border: 1px solid rgba(190, 120, 120, .35); color: #6b4a3a; }
+.intro .ver { bottom: calc(16px + var(--safe-b)); }
+.in-front { margin-bottom: 80px; } .intro::before { height: 80px; }
+
+/* ======== v4: ly trà giữa màn hình, nút chơi hạ thấp, thêm nhiều chi tiết động ======== */
+.in-hero { margin: 8px 0 0; width: 150px; height: 124px; }
+.hero-glow { width: 150px; height: 150px; }
+.hero-cup { font-size: 80px; }
+.intro .btn.big { margin-top: 10px; position: relative; overflow: hidden; }
+.intro .btn.big::after { content: ''; position: absolute; top: -20%; bottom: -20%; left: -45%; width: 30%; transform: skewX(-20deg); pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .55), rgba(255, 255, 255, 0)); animation: inGlint 3.4s ease-in-out infinite; }
+@keyframes inGlint { 0%, 55% { left: -45%; } 100% { left: 125%; } }
+.intro-title { position: relative; }
+.tt-spk { position: absolute; font-size: 18px; line-height: 1; animation: ttSpk 2.4s ease-in-out infinite; pointer-events: none; text-shadow: none; }
+.tt-spk.a { left: 1%; top: -14px; } .tt-spk.b { right: 5%; top: -8px; animation-delay: .8s; font-size: 15px; color: #f2b84a; } .tt-spk.c { right: 14%; bottom: -12px; animation-delay: 1.5s; font-size: 14px; }
+@keyframes ttSpk { 0%, 100% { transform: scale(.3) rotate(0); opacity: 0; } 45% { transform: scale(1.15) rotate(40deg); opacity: 1; } 70% { opacity: .5; } }
+
+/* dây đèn nhấp nháy dưới mái hiên */
+.in-lights { position: relative; z-index: 4; width: 100%; height: 0; flex: none; margin-top: -3px; display: flex; justify-content: space-around; padding: 0 3%; pointer-events: none; }
+.in-lights i { position: relative; width: 9px; height: 12px; margin-top: 2px; border-radius: 50% 50% 55% 55%; background: var(--c); box-shadow: 0 0 8px 2px var(--c); animation: inBulb 1.8s ease-in-out var(--d) infinite; }
+.in-lights i::before { content: ''; position: absolute; left: 3px; top: -5px; width: 3px; height: 6px; border-radius: 1px; background: #8a6a4a; }
+.in-lights i:nth-child(odd) { margin-top: 6px; }
+@keyframes inBulb { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.82); } }
+
+/* biển MỞ CỬA neon đung đưa */
+.in-sign { position: absolute; left: 26%; top: calc(clamp(28px, 5vh, 52px) + 108px); z-index: 4; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #fff; background: #3a2a4a; border: 2px solid #ff7aa2; box-shadow: 0 0 10px #ff7aa2, inset 0 0 6px rgba(255, 122, 162, .6); text-shadow: 0 0 6px #ff7aa2, 0 0 12px #ff3d8b; transform-origin: 50% -14px; animation: inSignSwing 3.8s ease-in-out infinite, inNeon 2.6s steps(1) infinite; pointer-events: none; }
+.in-sign::before { content: ''; position: absolute; left: 50%; top: -16px; width: 22px; height: 14px; margin-left: -11px; border: solid #8a6a4a; border-width: 1.5px 1.5px 0 0; transform: skewX(-30deg) scaleX(-1) rotate(0); opacity: .0; }
+@keyframes inSignSwing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes inNeon { 0%, 92%, 96%, 100% { opacity: 1; } 94% { opacity: .5; } 98% { opacity: .75; } }
+
+/* chim bay ngang */
+.in-birds { position: absolute; left: 0; right: 0; top: 2%; height: 40px; z-index: 2; pointer-events: none; }
+.in-birds span { position: absolute; left: -12%; font-size: 20px; animation: inBird 17s linear infinite; }
+.in-birds .b1 { top: 6px; } .in-birds .b2 { top: 20px; font-size: 15px; animation-duration: 23s; animation-delay: -9s; }
+@keyframes inBird { 0% { transform: translate(0, 0) scaleX(-1); } 25% { transform: translate(30vw, -10px) scaleX(-1); } 50% { transform: translate(62vw, 6px) scaleX(-1); } 75% { transform: translate(92vw, -8px) scaleX(-1); } 100% { transform: translate(122vw, 0) scaleX(-1); } }
+
+/* người và xe đi ngang qua trên sàn phía dưới */
+.in-walk { position: absolute; left: 0; right: 0; bottom: calc(4px + var(--safe-b)); height: 34px; z-index: 3; pointer-events: none; overflow: hidden; }
+.in-walk span { position: absolute; bottom: 0; line-height: 1; }
+.in-walk .w1 { font-size: 26px; left: -14%; animation: inWalk 24s linear infinite; }
+.in-walk .w1 i { position: absolute; left: -9px; top: 6px; font-size: 13px; font-style: normal; }
+.in-walk .w2 { font-size: 24px; right: -14%; animation: inWalkL 15s linear -6s infinite; }
+.in-walk .w3 { font-size: 20px; left: -14%; animation: inWalk 34s linear -18s infinite; }
+@keyframes inWalk { 0% { transform: translate(0, 0) scaleX(-1); } 25% { transform: translate(28vw, -2px) scaleX(-1); } 50% { transform: translate(58vw, 0) scaleX(-1); } 75% { transform: translate(88vw, -2px) scaleX(-1); } 100% { transform: translate(120vw, 0) scaleX(-1); } }
+@keyframes inWalkL { 0% { transform: translateX(0); } 100% { transform: translateX(-125vw); } }
+.intro .ver { z-index: 5; }
+@media (prefers-reduced-motion: reduce) { .in-lights i, .in-sign, .in-birds span, .in-walk span, .tt-spk, .intro .btn.big::after { animation: none; } }
+@media (max-height: 700px) { .in-hero { width: 110px; height: 90px; } .hero-cup { font-size: 58px; } .hero-glow { width: 110px; height: 110px; } .in-sign { display: none; } }
+.in-counter { margin-top: auto; }
+
+/* khách xếp hàng trước quầy, mỗi người gọi một món */
+.in-hero { margin-top: 5vh; }
+.in-counter { margin-top: 0; }
+.in-queue { position: relative; z-index: 3; margin-top: auto; width: 100%; display: flex; justify-content: space-around; align-items: flex-end; padding: 0 8%; flex: none; pointer-events: none; }
+.in-queue span { position: relative; font-size: 38px; line-height: 1; animation: inQueue 2.6s ease-in-out infinite; filter: drop-shadow(0 3px 3px rgba(80, 40, 20, .2)); }
+.in-queue .q2 { animation-delay: -.7s; } .in-queue .q3 { animation-delay: -1.4s; } .in-queue .q4 { animation-delay: -2s; }
+.in-queue b { position: absolute; left: 50%; top: -26px; margin-left: -4px; padding: 2px 6px; font-size: 15px; line-height: 1; border-radius: 12px 12px 12px 3px; background: #fff; box-shadow: 0 2px 5px rgba(80, 40, 20, .18); opacity: 0; animation: inOrder 6s ease-in-out infinite; }
+.in-queue .q1 b { animation-delay: 0s; } .in-queue .q2 b { animation-delay: 1.5s; } .in-queue .q3 b { animation-delay: 3s; } .in-queue .q4 b { animation-delay: 4.5s; }
+@keyframes inQueue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes inOrder { 0% { opacity: 0; transform: scale(.3); } 6%, 22% { opacity: 1; transform: scale(1); } 30%, 100% { opacity: 0; transform: scale(.6); } }
+@media (prefers-reduced-motion: reduce) { .in-queue span, .in-queue b { animation: none; } }
+@media (max-height: 700px) { .in-queue span { font-size: 30px; } .in-hero { margin-top: 2vh; } }
+
+/* ===== Nội dung dài thu gọn: bấm mới mở ===== */
+.fold > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 2px; font-size: 12.5px; font-weight: 600; color: var(--brown2); -webkit-tap-highlight-color: transparent; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: '▾'; color: var(--muted); transition: transform .18s; }
+.fold[open] > summary::after { transform: rotate(180deg); }
+.fold[open] > summary { margin-bottom: 4px; }
+.fold.policy, .fold.tipbox { padding: 6px 12px; }
+.fold.policy > summary, .fold.tipbox > summary { font-size: 13px; }
+.loc-body .fold { background: transparent; }
+
+/* dáng đi: người bước nhịp nhàng, chó chạy nước kiệu, xe rung nhẹ (trước đây chỉ trượt ngang như tấm ảnh) */
+.in-walk em { display: block; font-style: normal; line-height: 1; transform-origin: 50% 100%; }
+.in-walk .stp { animation: inStep .68s ease-in-out infinite; }
+.in-walk .trt { animation: inTrot .42s ease-in-out infinite; }
+.in-walk .rid { animation: inRide .22s linear infinite; }
+.in-walk span::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: -2px; height: 5px; border-radius: 50%; background: rgba(80, 50, 30, .22); z-index: -1; animation: inShadow .68s ease-in-out infinite; }
+.in-walk .w3::after { animation-duration: .42s; }
+@keyframes inStep { 0%, 100% { transform: translateY(0) rotate(-6deg) scale(1, 1); } 25% { transform: translateY(-5px) rotate(0) scale(.97, 1.04); } 50% { transform: translateY(0) rotate(6deg) scale(1, 1); } 75% { transform: translateY(-5px) rotate(0) scale(.97, 1.04); } }
+@keyframes inTrot { 0%, 100% { transform: translateY(0) rotate(-5deg) scaleX(1.06); } 50% { transform: translateY(-4px) rotate(4deg) scaleX(.95); } }
+@keyframes inRide { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+@keyframes inShadow { 0%, 50%, 100% { transform: scaleX(1); opacity: .25; } 25%, 75% { transform: scaleX(.7); opacity: .12; } }
+@media (prefers-reduced-motion: reduce) { .in-walk em, .in-walk span::after { animation: none; } }

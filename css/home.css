@@ -1,0 +1,27 @@
+/* ===== HOME ===== */
+.home { padding: 6px 10px 90px; display: flex; flex-direction: column; gap: 8px; background:
+  radial-gradient(circle at 8% 4%, rgba(255,255,255,.7) 0 60px, transparent 61px), var(--bg); }
+.sign { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: linear-gradient(#e7c9a5, #d9b289); border-radius: 18px 18px 6px 6px; position: relative; box-shadow: var(--sh-sm); }
+.sign-logo { flex: none; }
+.sign-name { flex: 1; background: var(--card); border-radius: 20px; padding: 6px 14px; font-size: 24px; font-weight: 800; color: #7a2f45; text-align: center; box-shadow: inset 0 0 0 3px #f1e1c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sign-name i { font-style: normal; font-size: 16px; color: #b49a86; }
+.logo-c { width: var(--sz, 54px); height: var(--sz, 54px); border-radius: 50%; background: var(--card2); border: 3px solid var(--pink); display: grid; place-items: center; overflow: hidden; flex: none; box-shadow: var(--sh-sm); font-size: calc(var(--sz, 54px) * .55); line-height: 1; }
+.logo-c img { width: 100%; height: 100%; object-fit: cover; }
+.loc-chips { display: flex; gap: 8px; justify-content: center; margin-top: -2px; }
+.loc-chips .chip { font-size: 13.5px; padding: 4px 14px; }
+.chalk { background: #2f4a3a; border: 7px solid #b0845c; border-radius: 12px; padding: 10px 14px 8px; color: #f6f2e2; box-shadow: var(--sh); font-family: var(--font); }
+.chalk h3 { text-align: center; font-size: 22px; margin-bottom: 6px; } .chalk h5 { font-size: 15px; margin: 6px 0 2px; }
+.chalk .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 22px; }
+.chalk .cr { display: flex; justify-content: space-between; font-size: 16px; border-bottom: 1px dashed rgba(255,255,255,.28); padding: 1px 0; }
+.chalk .sz { text-align: center; margin-top: 6px; font-size: 15px; opacity: .9; }
+.tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; background: var(--panel); border-radius: 16px; padding: 6px 3px; }
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px; padding: 5px 1px 4px; border-radius: 12px; font-size: 10.5px; font-weight: 800; color: #7a5b48; position: relative; min-height: 62px; line-height: 1.05; text-align: center; }
+.tile .t-i { font-size: 27px; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0,0,0,.15)); }
+.tile.on { background: var(--card); color: var(--brown); box-shadow: var(--sh-sm); }
+.tile em { position: absolute; top: 2px; right: 6px; font-size: 10px; font-style: normal; }
+.evb { display: flex; gap: 10px; align-items: center; background: #fff3d1; border: 2.5px solid #f6c84e; border-radius: 14px; padding: 10px 12px; }
+.evb .ev-i { font-size: 36px; } .evb b { font-size: 16px; } .evb p { font-size: 13px; color: var(--brown); font-weight: 600; }
+.expect { text-align: center; background: #f6ecd9; border-radius: 12px; padding: 6px; font-size: 17px; font-weight: 800; }
+.expect small { font-weight: 600; color: var(--muted); font-size: 12px; }
+.panel { background: transparent; }
+.panel-in { display: flex; flex-direction: column; gap: 8px; }
