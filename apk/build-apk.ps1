@@ -6,6 +6,7 @@ param(
   [string]$GameDir = '',         # mac dinh: thu muc cha cua apk\
   [string]$OutDir = '',          # mac dinh: <thu muc cha cua game>\tiemtra-apk
   [switch]$Release,              # build APK release da ky (tu tao khoa neu chua co)
+  [switch]$Aab,                  # build file AAB (Android App Bundle) da ky de tai len Google Play
   [switch]$Install,              # cai APK len dien thoai dang cam USB
   [switch]$Clean,                # xoa project Android cu va tao lai (giu khoa ky)
   [int]$VersionCode = 0,         # tang moi lan phat hanh ban moi, vd 2, 3...
@@ -16,6 +17,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if ($Aab) { $Release = $true }
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 # PowerShell 5.1 khong gan $PSScriptRoot trong khoi param(), nen tinh o day
@@ -328,6 +330,13 @@ function New-AppIcons {
   Exec 'npx.cmd' @('capacitor-assets', 'generate', '--android',
     '--iconBackgroundColor', '#ffd9e2', '--iconBackgroundColorDark', '#ffd9e2',
     '--splashBackgroundColor', '#FDF3E4', '--splashBackgroundColorDark', '#FDF3E4')
+  # Bo icon adaptive de Android dung nguyen anh icon-only.png (khong bi cat con ~2/3 o giua)
+  $res = Join-Path $OutDir 'android\app\src\main\res'
+  foreach ($n in @('ic_launcher.xml', 'ic_launcher_round.xml')) {
+    Get-ChildItem -Path $res -Directory -Filter 'mipmap-anydpi*' -ErrorAction SilentlyContinue | ForEach-Object {
+      $f = Join-Path $_.FullName $n; if (Test-Path $f) { Remove-Item $f -Force; Info "Bo $n (adaptive)" }
+    }
+  }
 }
 
 function New-Keystore {
@@ -405,28 +414,30 @@ try {
     $fresh = -not (Test-Path 'android')
     if ($fresh) { Step 'Tao project Android'; Exec 'npx.cmd' @('cap', 'add', 'android') }
     Edit-AndroidProject $sdk
-    if ($fresh) { New-AppIcons }
+    New-AppIcons   # luon tao lai icon, de sua anh trong apk\icons thi build lai la doi
     Step 'Dong bo game vao Android'
     Exec 'npx.cmd' @('cap', 'sync', 'android')
     if ($Release -and -not (Test-Path 'keystore.properties')) { New-Keystore }
   } finally { Pop-Location }
 
-  $task = if ($Release) { 'assembleRelease' } else { 'assembleDebug' }
+  $task = if ($Aab) { 'bundleRelease' } elseif ($Release) { 'assembleRelease' } else { 'assembleDebug' }
   $kind = if ($Release) { 'release' } else { 'debug' }
-  Step "Build APK $kind (lan dau Gradle tai them ~200MB, vui long doi)"
+  $what = if ($Aab) { 'AAB' } else { 'APK' }
+  Step "Build $what $kind (lan dau Gradle tai them ~200MB, vui long doi)"
   Push-Location (Join-Path $OutDir 'android')
   try { Exec '.\gradlew.bat' @($task) } finally { Pop-Location }
 
-  $apk = Join-Path $OutDir "android\app\build\outputs\apk\$kind\app-$kind.apk"
-  if (-not (Test-Path $apk)) { throw "Khong thay file APK: $apk" }
+  if ($Aab) { $apk = Join-Path $OutDir 'android\app\build\outputs\bundle\release\app-release.aab'; $ext = 'aab' }
+  else { $apk = Join-Path $OutDir "android\app\build\outputs\apk\$kind\app-$kind.apk"; $ext = 'apk' }
+  if (-not (Test-Path $apk)) { throw "Khong thay file $what - $apk" }
   $apkOutputDir = if ($ApkDir) { [IO.Path]::GetFullPath($ApkDir) } else { $OutDir }
   if (-not (Test-Path -LiteralPath $apkOutputDir)) { New-Item -ItemType Directory -Path $apkOutputDir | Out-Null }
-  $dest = Join-Path $apkOutputDir "TiemTraMoUoc-$kind.apk"
+  $dest = Join-Path $apkOutputDir "TiemTraMoUoc-$kind.$ext"
   Copy-Item $apk $dest -Force
   if ($Install) { Install-Apk $sdk $dest }
 
   Write-Host ''
-  Write-Host "XONG! APK: $dest" -ForegroundColor Green
+  Write-Host "XONG! $what - $dest" -ForegroundColor Green
   if ($Release) { Warn "Nho sao luu $OutDir\tiemtra.jks va keystore.properties." }
   if (-not $NoReveal) { Start-Process explorer.exe "/select,`"$dest`"" }
   exit 0
