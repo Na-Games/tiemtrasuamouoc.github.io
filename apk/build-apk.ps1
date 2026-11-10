@@ -200,6 +200,19 @@ function Install-CmdlineTools([string]$Sdk) {
   "$dest\bin\sdkmanager.bat"
 }
 
+# ---------- Quang cao Unity LevelPlay ----------
+# Doc apk\ads-config.json: appKey, interstitialId, rewardedId (lay trong dashboard LevelPlay).
+$LevelPlayVersion = '9.7.0'; $UnityAdsAdapterVersion = '5.15.0'
+function Get-AdsConfig {
+  $f = Join-Path $ScriptDir 'ads-config.json'
+  if (-not (Test-Path $f)) { throw "Thieu $f (appKey, interstitialId, rewardedId cua LevelPlay)" }
+  $c = (Read-Utf8 $f) | ConvertFrom-Json
+  foreach ($k in @('appKey', 'interstitialId', 'rewardedId')) {
+    if (-not $c.$k -or $c.$k -notmatch '^[a-z0-9]+$') { throw "ads-config.json: '$k' khong hop le" }
+  }
+  return @{ appKey = $c.appKey; interstitialId = $c.interstitialId; rewardedId = $c.rewardedId }
+}
+
 # ---------- Game -> www ----------
 function Build-Bundle {
   Step 'Build js/bundle.js (esbuild)'
@@ -219,11 +232,13 @@ function Copy-Web {
     elseif ($f -eq 'index.html') { throw "Khong thay $src" }
   }
   Copy-Item "$GameDir\js\compat.js", "$GameDir\js\bundle.js", "$ScriptDir\apk-shell.js" "$www\js"
+  $ads = Get-AdsConfig
+  Write-Utf8 "$www\js\ads-config.js" ("window.TT_ADS_CONFIG = " + ($ads | ConvertTo-Json -Compress) + ";")
   $index = Join-Path $www 'index.html'
   $html = Read-Utf8 $index
   $tag = '<script src="js/bundle.js"></script>'
   if (-not $html.Contains($tag)) { throw "index.html khong co $tag" }
-  Write-Utf8 $index $html.Replace($tag, $tag + "`n<script src=`"js/apk-shell.js`"></script>")
+  Write-Utf8 $index $html.Replace($tag, $tag + "`n<script src=`"js/ads-config.js`"></script>`n<script src=`"js/apk-shell.js`"></script>")
 }
 
 # ---------- Project Capacitor ----------
@@ -274,6 +289,11 @@ function Edit-AndroidProject([string]$Sdk) {
   if (-not $t.Contains('android:screenOrientation')) {
     $t = $t.Replace('android:name=".MainActivity"', "android:name=`".MainActivity`"`n            android:screenOrientation=`"portrait`"")
   }
+  # LevelPlay: quyen AD_ID (Android 13+) de nhan dien quang cao
+  if (-not $t.Contains('permission.AD_ID')) {
+    $t = $t.Replace('<uses-permission android:name="android.permission.INTERNET" />',
+      "<uses-permission android:name=`"android.permission.INTERNET`" />`n    <uses-permission android:name=`"com.google.android.gms.permission.AD_ID`" />")
+  }
   Write-Utf8 $p $t
 
   # Phu vung tai tho
@@ -285,6 +305,24 @@ function Edit-AndroidProject([string]$Sdk) {
     }
     Write-Utf8 $p $t
   }
+
+  # Plugin LevelPlay (Java) + dang ky trong MainActivity
+  $javaDir = "$main\java\" + $AppId.Replace('.', '\')
+  Copy-Item "$ScriptDir\native\LevelPlayPlugin.java" $javaDir -Force
+  Write-Utf8 "$javaDir\MainActivity.java" @"
+package $AppId;
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(LevelPlayPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
+}
+"@
 
   # Ky ban release bang keystore.properties
   $p = Join-Path $OutDir 'android\app\build.gradle'; $t = Read-Utf8 $p
@@ -308,6 +346,11 @@ function Edit-AndroidProject([string]$Sdk) {
 "@
     $t = ([regex]'(?m)^[ \t]*buildTypes \{\r?\n').Replace($t, $signing.Replace("`r`n", "`n") + "`n", 1)
     $t = ([regex]'minifyEnabled false').Replace($t, "if (keystorePropsFile.exists()) signingConfig signingConfigs.release`n            minifyEnabled false", 1)
+  }
+  # LevelPlay SDK + adapter Unity Ads + ID quang cao
+  if (-not $t.Contains('ads-mediation:mediation-sdk')) {
+    $deps = "    implementation 'com.unity3d.ads-mediation:mediation-sdk:$LevelPlayVersion'`n    implementation 'com.unity3d.ads-mediation:unityads-adapter:$UnityAdsAdapterVersion'`n    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'`n"
+    $t = $t.Replace("    implementation project(':capacitor-android')`n", "    implementation project(':capacitor-android')`n" + $deps)
   }
   if ($VersionCode -gt 0) { $t = $t -replace 'versionCode \d+', "versionCode $VersionCode" }
   if ($VersionName) { $t = $t -replace 'versionName "[^"]*"', "versionName `"$VersionName`"" }

@@ -549,6 +549,23 @@ textarea {
   margin-bottom: 4px;
 }
 
+.cta-rush {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  background: #fff7e0;
+  color: #8a4a00;
+  border: 2px dashed #f0a030;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.cta-rush-on {
+  color: #c2410c;
+}
+
 /* ===== FX / toast ===== */
 .fx {
   position: fixed;

@@ -11,6 +11,7 @@ import { SH, closeNow, nextDay } from './sell.js';
 import { icon } from './icons.js';
 import { copyText } from './platform.js';
 import { guideHTML } from './guide-content.js';
+import { rewardedReady, showRewarded, maybeInterstitial } from './ads.js';
 
 /* ===== Delegation ===== */
 export function bindActions(root, map) {
@@ -262,6 +263,7 @@ export function openDaySummary() {
   const tw = WEATHERS[tomorrow.weather];
   const agg = aggregate([{ ...T, stars: T.avgStars }]);
   agg.profit = T.profit; agg.rev = T.rev + T.tips;
+  const bonus = Math.max(0, Math.round(T.profit || 0));   // thưởng quảng cáo = nhân đôi lãi trong ngày
   const m = openModal({
     cls: 'day', closable: false, id: 'day', html: `
     <div class="day-moon">🌙<small>⭐</small></div>
@@ -272,12 +274,20 @@ export function openDaySummary() {
     ${T.fine ? `<div class="exp-note">📋 Tiền phạt kiểm tra đột xuất: −${fmtK(T.fine)}</div>` : ''}
     <div class="day-cash"><span>🗄️ Số dư két</span><b>${fmtK(S.money)}</b></div>
     <div class="tomorrow">📅 <b>Ngày mai:</b> ${esc(tw.tip)}</div>
+    ${bonus > 0 && !T.adDouble && rewardedReady() ? `<button class="btn ghost block day-ad" data-act="ad2">🎬 Xem quảng cáo · nhân đôi lãi: +${fmtK(bonus)}</button>` : ''}
     <button class="btn ghost block" data-act="sum">📊 Tổng kết</button>
     <button class="btn pri block" data-act="next">Ngày ${S.day + 1} ➜</button>`,
   });
   bindActions(m.body, {
-    sum: () => { m.close(); nextDay(); S.tab = 'tongket'; markDirty('view', 'panel'); sfx('success'); emit('goto', 'tongket'); },
-    next: () => { m.close(); nextDay(); sfx('success'); },
+    ad2: () => showRewarded(() => {
+      if (T.adDouble) return;
+      T.adDouble = true; S.money += bonus; markDirty('hud', 'cta'); requestSave(); sfx('coin');
+      const cash = $('.day-cash b', m.body); if (cash) cash.textContent = fmtK(S.money);
+      const btn = $('[data-act="ad2"]', m.body); if (btn) btn.remove();
+      toast(`Nhận thêm +${fmtK(bonus)} 🎉`, 'ok');
+    }),
+    sum: () => { m.close(); nextDay(); S.tab = 'tongket'; markDirty('view', 'panel'); sfx('success'); emit('goto', 'tongket'); maybeInterstitial(); },
+    next: () => { m.close(); nextDay(); sfx('success'); maybeInterstitial(); },
   });
 }
 

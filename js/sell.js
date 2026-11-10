@@ -717,7 +717,7 @@ export function nextDay() {
   S.social.videoBuff = 0; S.social.videoDay = S.day;
   const ad = S.social.ad && S.day <= S.social.ad.endsDay ? ADS.find(a => a.id === S.social.ad.id) : null;
   if (ad) { for (let i = 0; i < ad.posts; i++) S.social.posts.unshift(genPost()); S.social.posts = S.social.posts.slice(0, 10); }
-  S.pearl.playsDay = 0;
+  S.pearl.playsDay = 0; S.pearl.adPlays = 0;
   S.crush.playedToday = false;
   // vườn
   const g = S.garden;

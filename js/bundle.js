@@ -1552,6 +1552,7 @@
     }
     if (S.social.ad && S.day <= S.social.ad.endsDay) b.traffic += ((_b = ADS.find((a) => a.id === S.social.ad.id)) == null ? void 0 : _b.traffic) || 0;
     if (S.social.videoDay === S.day) b.traffic += S.social.videoBuff || 0;
+    if (S.social.rushDay === S.day) b.traffic += 0.5;
     if (petActive()) {
       const fx = ((_c = PETS[S.pet.kind]) == null ? void 0 : _c.fx) || {};
       b.bill += fx.bill || 0;
@@ -2298,6 +2299,41 @@
     return guideSections().map((s) => `<details class="g-det" data-guide-section="${s.id}"${s.open ? " open" : ""}><summary>${s.ico} ${esc(s.title)}</summary><ul class="g-list">${s.rows.map(([ico, body, target]) => `<li data-guide-target="${esc(target)}"><span class="g-art" aria-hidden="true">${ico}</span><div>${body}</div></li>`).join("")}</ul></details>`).join("");
   }
 
+  // js/ads.js
+  var INTERSTITIAL_GAP_MS = 3 * 60 * 1e3;
+  var AFTER_REWARDED_MS = 2 * 60 * 1e3;
+  var EVERY = { day: 2, game: 3 };
+  var lastInterstitial = 0;
+  var lastRewarded = 0;
+  var counts = {};
+  var bridge = () => typeof window !== "undefined" ? window.TTAds : null;
+  var rewardedReady = () => {
+    const b = bridge();
+    return !!(b && b.rewardedReady());
+  };
+  function showRewarded(onReward, onFail) {
+    const b = bridge();
+    if (!b || !b.rewardedReady()) {
+      if (onFail) onFail();
+      return;
+    }
+    b.showRewarded((earned) => {
+      if (earned) {
+        lastRewarded = Date.now();
+        onReward();
+      } else if (onFail) onFail();
+    });
+  }
+  function maybeInterstitial(kind = "day") {
+    const b = bridge();
+    if (!b) return;
+    counts[kind] = (counts[kind] || 0) + 1;
+    if (counts[kind] % (EVERY[kind] || 2)) return;
+    const now = Date.now();
+    if (now - lastInterstitial < INTERSTITIAL_GAP_MS || now - lastRewarded < AFTER_REWARDED_MS) return;
+    if (b.showInterstitial()) lastInterstitial = now;
+  }
+
   // js/ui.js
   function bindActions(root2, map) {
     root2.addEventListener("click", (e) => {
@@ -2568,6 +2604,7 @@
     const agg = aggregate([{ ...T, stars: T.avgStars }]);
     agg.profit = T.profit;
     agg.rev = T.rev + T.tips;
+    const bonus2 = Math.max(0, Math.round(T.profit || 0));
     const m = openModal({
       cls: "day",
       closable: false,
@@ -2581,10 +2618,24 @@
     ${T.fine ? `<div class="exp-note">\u{1F4CB} Ti\u1EC1n ph\u1EA1t ki\u1EC3m tra \u0111\u1ED9t xu\u1EA5t: \u2212${fmtK(T.fine)}</div>` : ""}
     <div class="day-cash"><span>\u{1F5C4}\uFE0F S\u1ED1 d\u01B0 k\xE9t</span><b>${fmtK(S.money)}</b></div>
     <div class="tomorrow">\u{1F4C5} <b>Ng\xE0y mai:</b> ${esc(tw.tip)}</div>
+    ${bonus2 > 0 && !T.adDouble && rewardedReady() ? `<button class="btn ghost block day-ad" data-act="ad2">\u{1F3AC} Xem qu\u1EA3ng c\xE1o \xB7 nh\xE2n \u0111\xF4i l\xE3i: +${fmtK(bonus2)}</button>` : ""}
     <button class="btn ghost block" data-act="sum">\u{1F4CA} T\u1ED5ng k\u1EBFt</button>
     <button class="btn pri block" data-act="next">Ng\xE0y ${S.day + 1} \u279C</button>`
     });
     bindActions(m.body, {
+      ad2: () => showRewarded(() => {
+        if (T.adDouble) return;
+        T.adDouble = true;
+        S.money += bonus2;
+        markDirty("hud", "cta");
+        requestSave();
+        sfx("coin");
+        const cash = $(".day-cash b", m.body);
+        if (cash) cash.textContent = fmtK(S.money);
+        const btn = $('[data-act="ad2"]', m.body);
+        if (btn) btn.remove();
+        toast(`Nh\u1EADn th\xEAm +${fmtK(bonus2)} \u{1F389}`, "ok");
+      }),
       sum: () => {
         m.close();
         nextDay();
@@ -2592,11 +2643,13 @@
         markDirty("view", "panel");
         sfx("success");
         emit("goto", "tongket");
+        maybeInterstitial();
       },
       next: () => {
         m.close();
         nextDay();
         sfx("success");
+        maybeInterstitial();
       }
     });
   }
@@ -4144,6 +4197,7 @@
       S.social.posts = S.social.posts.slice(0, 10);
     }
     S.pearl.playsDay = 0;
+    S.pearl.adPlays = 0;
     S.crush.playedToday = false;
     const g = S.garden;
     for (const p of g.plots) if (p.seed) {
@@ -6699,6 +6753,7 @@
       S.crush.perm = Math.min(0.5, S.crush.perm + 0.01);
       const money2 = 8e3 + L * 2e3;
       S.money += money2;
+      q.winMoney = money2;
       reward2 = `+1% doanh thu v\u0129nh vi\u1EC5n \xB7 +${fmtK(money2)}`;
       if (L % 5 === 0) {
         S.collection.packs++;
@@ -6712,7 +6767,7 @@
     requestSave();
     const ov = $("#crushOver");
     ov.hidden = false;
-    ov.innerHTML = `<div class="ov-card"><div class="ov-ico">${win ? "\u{1F3C6}" : "\u{1F63F}"}</div><h3>${win ? "Th\u1EAFng m\xE0n " + L + "!" : "H\u1EBFt l\u01B0\u1EE3t r\u1ED3i!"}</h3><p>${win ? esc(reward2) : "Th\u1EED l\u1EA1i nh\xE9, b\u1EA1n s\u1EBD l\xE0m \u0111\u01B0\u1EE3c th\xF4i!"}</p><button class="btn pri block" data-act="${win ? "next" : "retry"}">${win ? "M\xE0n ti\u1EBFp theo \u279C" : "Ch\u01A1i l\u1EA1i"}</button><button class="btn ghost block" data-act="x">\u0110\xF3ng</button></div>`;
+    ov.innerHTML = `<div class="ov-card"><div class="ov-ico">${win ? "\u{1F3C6}" : "\u{1F63F}"}</div><h3>${win ? "Th\u1EAFng m\xE0n " + L + "!" : "H\u1EBFt l\u01B0\u1EE3t r\u1ED3i!"}</h3><p>${win ? esc(reward2) : "Th\u1EED l\u1EA1i nh\xE9, b\u1EA1n s\u1EBD l\xE0m \u0111\u01B0\u1EE3c th\xF4i!"}</p>${rewardedReady() ? win ? `<button class="btn ghost block" data-act="ad2">\u{1F3AC} Xem qu\u1EA3ng c\xE1o \xB7 nh\xE2n \u0111\xF4i ti\u1EC1n: +${fmtK(q.winMoney)}</button>` : q.revived ? "" : '<button class="btn ghost block" data-act="revive">\u{1F3AC} Xem qu\u1EA3ng c\xE1o \xB7 +3 l\u01B0\u1EE3t \u0111i</button>' : ""}<button class="btn pri block" data-act="${win ? "next" : "retry"}">${win ? "M\xE0n ti\u1EBFp theo \u279C" : "Ch\u01A1i l\u1EA1i"}</button><button class="btn ghost block" data-act="x">\u0110\xF3ng</button></div>`;
   }
   function crushHTML() {
     const q = Q;
@@ -6736,8 +6791,40 @@
     const restart = () => {
       m.close();
       openCrush();
+      maybeInterstitial("game");
     };
-    bindActions(m.body, { retry: restart, next: restart, x: () => m.close() });
+    bindActions(m.body, {
+      retry: restart,
+      next: restart,
+      x: () => {
+        m.close();
+        maybeInterstitial("game");
+      },
+      ad2: () => showRewarded(() => {
+        if (!Q || Q.doubled || !Q.winMoney) return;
+        Q.doubled = true;
+        S.money += Q.winMoney;
+        markDirty("hud");
+        requestSave();
+        sfx("coin");
+        const b = $('[data-act="ad2"]', m.body);
+        if (b) b.remove();
+        toast(`Nh\u1EADn th\xEAm +${fmtK(Q.winMoney)} \u{1F389}`, "ok");
+      }),
+      revive: () => showRewarded(() => {
+        if (!Q || !Q.over || Q.revived) return;
+        Q.revived = true;
+        Q.over = false;
+        Q.moves += 3;
+        const ov = $("#crushOver");
+        if (ov) {
+          ov.hidden = true;
+          ov.innerHTML = "";
+        }
+        updateHud(Q);
+        sfx("success");
+      })
+    });
     const board = $("#crushBoard", m.body);
     let down = null;
     const pointerDown = (e) => {
@@ -6945,6 +7032,7 @@
     if (!rewards.length && P2.score >= 40) rewards.push(["tcDen", Math.floor(P2.score / 40)]);
     S.money += money2;
     for (const [id, q] of rewards) addStock(id, q);
+    P2.last = { money: money2, rewards };
     S.pearl.best = Math.max(S.pearl.best, P2.score);
     let extra = "";
     if (win && chance(0.3)) {
@@ -6955,16 +7043,43 @@
     requestSave();
     sfx(win ? "win" : "lose");
     const rw = rewards.length ? rewards.map(([id, q]) => `<span class="prw">${pearlIcon(PIDS.indexOf(id), "reward-pearl")}+${q} ${esc(ITEMS[id].name)}</span>`).join("") : '<span class="muted">Ch\u01B0a \u0111\u1EE7 vi\xEAn \u0111\u1EC3 nh\u1EADn tr\xE2n ch\xE2u</span>';
-    $("#pBody").innerHTML = `<div class="ov-card inline"><div class="ov-ico">${win ? "\u{1F3C6}" : "\u{1F642}"}</div><h3>${win ? "TH\xC0NH C\xD4NG!" : "C\u1ED1 l\xEAn l\u1EA7n sau!"}</h3><p>\u0110i\u1EC3m: <b>${P2.score}</b> \xB7 Combo cao nh\u1EA5t: <b>x${P2.maxMul}</b> (k\u1EF7 l\u1EE5c ${S.pearl.best})</p><p>Ti\u1EC1n th\u01B0\u1EDFng: <b class="money">+${fmtK(money2)}</b></p><div class="prws">${rw}</div>${extra}<button class="btn pri block" data-act="x">Nh\u1EADn th\u01B0\u1EDFng \u{1F381}</button></div>`;
+    $("#pBody").innerHTML = `<div class="ov-card inline"><div class="ov-ico">${win ? "\u{1F3C6}" : "\u{1F642}"}</div><h3>${win ? "TH\xC0NH C\xD4NG!" : "C\u1ED1 l\xEAn l\u1EA7n sau!"}</h3><p>\u0110i\u1EC3m: <b>${P2.score}</b> \xB7 Combo cao nh\u1EA5t: <b>x${P2.maxMul}</b> (k\u1EF7 l\u1EE5c ${S.pearl.best})</p><p>Ti\u1EC1n th\u01B0\u1EDFng: <b class="money">+${fmtK(money2)}</b></p><div class="prws">${rw}</div>${extra}${rewardedReady() && (money2 > 0 || rewards.length) ? '<button class="btn ghost block" data-act="p2">\u{1F3AC} Xem qu\u1EA3ng c\xE1o \xB7 nh\xE2n \u0111\xF4i th\u01B0\u1EDFng</button>' : ""}<button class="btn pri block" data-act="x">Nh\u1EADn th\u01B0\u1EDFng \u{1F381}</button></div>`;
   }
   function openPearl() {
-    if (S.pearl.playsDay >= 3) return toast("H\xF4m nay b\u1EA1n \u0111\xE3 ch\u01A1i \u0111\u1EE7 3 l\u01B0\u1EE3t Tr\xE2n Ch\xE2u N\u1ED5", "err");
+    if (S.pearl.playsDay >= 3) {
+      if (rewardedReady()) {
+        return showRewarded(() => {
+          S.pearl.playsDay = Math.max(0, S.pearl.playsDay - 1);
+          S.pearl.adPlays = (S.pearl.adPlays || 0) + 1;
+          requestSave();
+          markDirty("panel");
+          openPearl();
+        });
+      }
+      return toast("H\xF4m nay b\u1EA1n \u0111\xE3 ch\u01A1i \u0111\u1EE7 3 l\u01B0\u1EE3t Tr\xE2n Ch\xE2u N\u1ED5", "err");
+    }
     const m = openModal({ id: "pearl", cls: "pearl-modal", onClose: () => {
       if (P2 == null ? void 0 : P2.timer) clearInterval(P2.timer);
       P2 = null;
     }, html: `<div id="pBody"><h3 class="m-title">\u2728 Tr\xE2n Ch\xE2u N\u1ED5</h3><div class="pearl-preview">${PIDS.map((_, i) => pearlIcon(i)).join("")}</div><p class="m-text center">Ch\u1EA1m nh\xF3m \u2265 2 tr\xE2n ch\xE2u c\xF9ng m\xE0u k\u1EC1 nhau \u0111\u1EC3 l\xE0m n\u1ED5. Nh\xF3m c\xE0ng l\u1EDBn \u0111i\u1EC3m c\xE0ng cao, n\u1ED5 li\xEAn ti\u1EBFp trong ${PCOMBO_MS / 1e3}s = nh\xE2n combo! M\u1EE5c ti\xEAu <b>${PGOAL}</b> \u0111i\u1EC3m trong ${PDUR} gi\xE2y. Cu\u1ED1i v\xE1n nh\u1EADn th\xEAm tr\xE2n ch\xE2u nguy\xEAn li\u1EC7u cho kho.</p><p class="m-text center muted">L\u01B0\u1EE3t h\xF4m nay: ${S.pearl.playsDay}/3 \xB7 K\u1EF7 l\u1EE5c: ${S.pearl.best}</p><button class="btn pri block" data-act="start">\u25B6 B\u1EAFt \u0111\u1EA7u</button></div>` });
     bindActions(m.body, {
-      x: () => m.close(),
+      x: () => {
+        const ended = !!(P2 && P2.over);
+        m.close();
+        if (ended) maybeInterstitial("game");
+      },
+      p2: () => showRewarded(() => {
+        if (!P2 || !P2.last || P2.doubled) return;
+        P2.doubled = true;
+        S.money += P2.last.money;
+        for (const [id, q] of P2.last.rewards) addStock(id, q);
+        markDirty("hud", "panel");
+        requestSave();
+        sfx("coin");
+        const b = $('[data-act="p2"]', m.body);
+        if (b) b.remove();
+        toast("\u0110\xE3 nh\xE2n \u0111\xF4i th\u01B0\u1EDFng! \u{1F389}", "ok");
+      }),
       start: () => {
         if (P2 && !P2.over) return;
         S.pearl.playsDay++;
@@ -7405,14 +7520,23 @@
       el.innerHTML = `<button class="cta-btn cta-red" data-act="tokho">\u26A0\uFE0F Ch\u01B0a n\u1EA5u ${chk.miss.map((m) => m === "Tr\xE0" ? "\u{1FAD6} Tr\xE0" : m === "Topping" ? "\u{1F9CB} Topping" : "\u{1F964} D\u1EE5ng c\u1EE5").join(" \xB7 ")}</button>`;
     } else {
       el.className = "cta";
-      el.innerHTML = `${chk.miss.length ? `<div class="cta-warn">\u26A0\uFE0F Ch\u01B0a c\xF3 ${chk.miss.join(", ")} \u2014 v\u1EABn c\xF3 th\u1EC3 m\u1EDF c\u1EEDa</div>` : ""}<button class="cta-btn" data-act="open">M\u1EDF c\u1EEDa ng\xE0y ${S.day}</button>`;
+      const rush = S.social.rushDay === S.day ? '<div class="cta-warn cta-rush-on">\u{1F525} Gi\u1EDD cao \u0111i\u1EC3m \u0111ang b\u1EADt: +50% kh\xE1ch h\xF4m nay</div>' : rewardedReady() ? '<button class="cta-rush" data-act="rush">\u{1F3AC} Xem qu\u1EA3ng c\xE1o \xB7 Gi\u1EDD cao \u0111i\u1EC3m +50% kh\xE1ch h\xF4m nay</button>' : "";
+      el.innerHTML = `${chk.miss.length ? `<div class="cta-warn">\u26A0\uFE0F Ch\u01B0a c\xF3 ${chk.miss.join(", ")} \u2014 v\u1EABn c\xF3 th\u1EC3 m\u1EDF c\u1EEDa</div>` : ""}${rush}<button class="cta-btn" data-act="open">M\u1EDF c\u1EEDa ng\xE0y ${S.day}</button>`;
     }
   }
   var ctaBound = false;
   function bindCta() {
     if (ctaBound) return;
     ctaBound = true;
+    window.addEventListener("ttads:ready", () => markDirty("cta"));
     bindActions($("#cta"), {
+      rush: () => showRewarded(() => {
+        S.social.rushDay = S.day;
+        markDirty("cta");
+        requestSave();
+        sfx("bell");
+        toast("Gi\u1EDD cao \u0111i\u1EC3m! +50% kh\xE1ch h\xF4m nay \u{1F525}", "ok");
+      }),
       plan: () => {
         const e = commitPlan();
         if (e) {

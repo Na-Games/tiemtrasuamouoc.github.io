@@ -10,6 +10,7 @@ import { PANELS1 } from './panels1.js';
 import { PANELS2 } from './panels2.js';
 import { PANELS3 } from './panels3.js';
 import { crush } from './minigames.js';
+import { rewardedReady, showRewarded } from './ads.js';
 import { openLogoModal } from './avatar.js';
 import { icon } from './icons.js';
 
@@ -141,14 +142,21 @@ export function renderCta() {
     el.innerHTML = `<button class="cta-btn cta-red" data-act="tokho">⚠️ Chưa nấu ${chk.miss.map((m) => (m === 'Trà' ? '🫖 Trà' : m === 'Topping' ? '🧋 Topping' : '🥤 Dụng cụ')).join(' · ')}</button>`;
   } else {
     el.className = 'cta';
-    el.innerHTML = `${chk.miss.length ? `<div class="cta-warn">⚠️ Chưa có ${chk.miss.join(', ')} — vẫn có thể mở cửa</div>` : ''}<button class="cta-btn" data-act="open">Mở cửa ngày ${S.day}</button>`;
+    const rush = S.social.rushDay === S.day
+      ? '<div class="cta-warn cta-rush-on">🔥 Giờ cao điểm đang bật: +50% khách hôm nay</div>'
+      : rewardedReady() ? '<button class="cta-rush" data-act="rush">🎬 Xem quảng cáo · Giờ cao điểm +50% khách hôm nay</button>' : '';
+    el.innerHTML = `${chk.miss.length ? `<div class="cta-warn">⚠️ Chưa có ${chk.miss.join(', ')} — vẫn có thể mở cửa</div>` : ''}${rush}<button class="cta-btn" data-act="open">Mở cửa ngày ${S.day}</button>`;
   }
 }
 let ctaBound = false;
 export function bindCta() {
   if (ctaBound) return;
   ctaBound = true;
+  window.addEventListener('ttads:ready', () => markDirty('cta'));   // quảng cáo tải xong -> hiện nút thưởng
   bindActions($('#cta'), {
+    rush: () => showRewarded(() => {
+      S.social.rushDay = S.day; markDirty('cta'); requestSave(); sfx('bell'); toast('Giờ cao điểm! +50% khách hôm nay 🔥', 'ok');
+    }),
     plan: () => { const e = E.commitPlan(); if (e) { toast(e, 'err'); sfx('error'); } else { sfx('coin'); toast('Đã nấu & nhập nguyên liệu!', 'ok'); } },
     tokho: () => { const missing = E.openMissing().miss; S.subtab.kho = missing.includes('Trà') ? 'tra' : missing.includes('Dụng cụ') ? 'dc' : 'top'; goTab('kho'); toast('Vào Kho chọn Trà, Topping, Dụng cụ rồi bấm Nấu & nhập', ''); },
     open: () => {

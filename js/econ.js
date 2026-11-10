@@ -105,6 +105,7 @@ export function bonus() {
   if (taxActive()) { b.traffic += TAX.traffic; b.speedStaff += TAX.speed; b.theft += TAX.theft; b.lucky += TAX.lucky; }
   if (S.social.ad && S.day <= S.social.ad.endsDay) b.traffic += ADS.find((a) => a.id === S.social.ad.id)?.traffic || 0;
   if (S.social.videoDay === S.day) b.traffic += S.social.videoBuff || 0;
+  if (S.social.rushDay === S.day) b.traffic += 0.5;   // Giờ cao điểm (xem quảng cáo thưởng)
   if (petActive()) {
     const fx = PETS[S.pet.kind]?.fx || {};
     b.bill += fx.bill || 0; b.tip += fx.tip || 0; b.patience += fx.patience || 0; b.branch += fx.branch || 0;

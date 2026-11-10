@@ -16,3 +16,38 @@
     App.minimizeApp();
   });
 })();
+
+/* Quảng cáo Unity LevelPlay: tạo window.TTAds cho game (js/ads.js). ID lấy từ apk/ads-config.json qua js/ads-config.js. */
+(function () {
+  var C = window.Capacitor, L = C && C.Plugins && C.Plugins.LevelPlay;
+  if (!L || !C.isNativePlatform || !C.isNativePlatform()) return;
+  var cfg = window.TT_ADS_CONFIG || {};
+  var rewardedOk = false, interOk = false, busy = false, done = null;
+
+  L.addListener('rewardedLoaded', function () {
+    rewardedOk = true;
+    window.dispatchEvent(new Event('ttads:ready'));
+  });
+  L.addListener('rewardedDone', function (e) {   // chỉ trả thưởng khi đã xem đủ
+    var cb = done; done = null; busy = false; rewardedOk = false;
+    if (cb) cb(!!(e && e.earned));
+  });
+  L.addListener('interstitialLoaded', function () { interOk = true; });
+
+  window.TTAds = {
+    rewardedReady: function () { return rewardedOk && !busy; },
+    showRewarded: function (cb) {
+      if (!rewardedOk || busy) { cb(false); return; }
+      busy = true; done = cb;
+      L.showRewarded().catch(function () { busy = false; done = null; rewardedOk = false; cb(false); });
+    },
+    showInterstitial: function () {
+      if (!interOk) return false;
+      interOk = false;
+      L.showInterstitial().catch(function () {});
+      return true;
+    },
+  };
+
+  L.init({ appKey: cfg.appKey, rewardedId: cfg.rewardedId, interstitialId: cfg.interstitialId }).catch(function () {});
+})();

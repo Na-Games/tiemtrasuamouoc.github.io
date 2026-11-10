@@ -6,6 +6,7 @@ import { S, markDirty, requestSave, esc, fmt, fmtK, sfx, rand, randInt, pick, ch
 import * as E from './econ.js';
 import { openModal, toast, bindActions, fxText, fxSpark } from './ui.js';
 import { pearlIcon } from './pearl-art.js';
+import { rewardedReady, showRewarded, maybeInterstitial } from './ads.js';
 
 /* ======================= MILK TEA CRUSH ======================= */
 const N = 7;
@@ -296,6 +297,7 @@ function finish(q, win) {
     S.crush.perm = Math.min(0.5, S.crush.perm + 0.01);
     const money = 8000 + L * 2000;
     S.money += money;
+    q.winMoney = money;
     reward = `+1% doanh thu vĩnh viễn · +${fmtK(money)}`;
     if (L % 5 === 0) {
       S.collection.packs++;
@@ -309,7 +311,7 @@ function finish(q, win) {
   requestSave();
   const ov = $('#crushOver');
   ov.hidden = false;
-  ov.innerHTML = `<div class="ov-card"><div class="ov-ico">${win ? '🏆' : '😿'}</div><h3>${win ? 'Thắng màn ' + L + '!' : 'Hết lượt rồi!'}</h3><p>${win ? esc(reward) : 'Thử lại nhé, bạn sẽ làm được thôi!'}</p><button class="btn pri block" data-act="${win ? 'next' : 'retry'}">${win ? 'Màn tiếp theo ➜' : 'Chơi lại'}</button><button class="btn ghost block" data-act="x">Đóng</button></div>`;
+  ov.innerHTML = `<div class="ov-card"><div class="ov-ico">${win ? '🏆' : '😿'}</div><h3>${win ? 'Thắng màn ' + L + '!' : 'Hết lượt rồi!'}</h3><p>${win ? esc(reward) : 'Thử lại nhé, bạn sẽ làm được thôi!'}</p>${rewardedReady() ? (win ? `<button class="btn ghost block" data-act="ad2">🎬 Xem quảng cáo · nhân đôi tiền: +${fmtK(q.winMoney)}</button>` : (q.revived ? '' : '<button class="btn ghost block" data-act="revive">🎬 Xem quảng cáo · +3 lượt đi</button>')) : ''}<button class="btn pri block" data-act="${win ? 'next' : 'retry'}">${win ? 'Màn tiếp theo ➜' : 'Chơi lại'}</button><button class="btn ghost block" data-act="x">Đóng</button></div>`;
 }
 function crushHTML() {
   const q = Q;
@@ -328,8 +330,22 @@ export function openCrush() {
   const m = openModal({ id: 'crush', cls: 'crush-m', html: crushHTML(), onClose: () => { Q = null; } });
   paint(Q, true);
   updateHud(Q);
-  const restart = () => { m.close(); openCrush(); };
-  bindActions(m.body, { retry: restart, next: restart, x: () => m.close() });
+  const restart = () => { m.close(); openCrush(); maybeInterstitial('game'); };
+  bindActions(m.body, {
+    retry: restart, next: restart, x: () => { m.close(); maybeInterstitial('game'); },
+    ad2: () => showRewarded(() => {
+      if (!Q || Q.doubled || !Q.winMoney) return;
+      Q.doubled = true; S.money += Q.winMoney; markDirty('hud'); requestSave(); sfx('coin');
+      const b = $('[data-act="ad2"]', m.body); if (b) b.remove();
+      toast(`Nhận thêm +${fmtK(Q.winMoney)} 🎉`, 'ok');
+    }),
+    revive: () => showRewarded(() => {
+      if (!Q || !Q.over || Q.revived) return;
+      Q.revived = true; Q.over = false; Q.moves += 3;
+      const ov = $('#crushOver'); if (ov) { ov.hidden = true; ov.innerHTML = ''; }
+      updateHud(Q); sfx('success');
+    }),
+  });
   const board = $('#crushBoard', m.body);
   let down = null;
   const pointerDown = (e) => {
@@ -495,19 +511,33 @@ function pEnd() {
   if (!rewards.length && P.score >= 40) rewards.push(['tcDen', Math.floor(P.score / 40)]);
   S.money += money;
   for (const [id, q] of rewards) E.addStock(id, q);
+  P.last = { money, rewards };
   S.pearl.best = Math.max(S.pearl.best, P.score);
   let extra = '';
   if (win && chance(0.3)) { S.collection.packs++; extra = '<p>🎁 +1 túi quà sưu tầm!</p>'; }
   markDirty('hud', 'panel'); requestSave();
   sfx(win ? 'win' : 'lose');
   const rw = rewards.length ? rewards.map(([id, q]) => `<span class="prw">${pearlIcon(PIDS.indexOf(id), 'reward-pearl')}+${q} ${esc(ITEMS[id].name)}</span>`).join('') : '<span class="muted">Chưa đủ viên để nhận trân châu</span>';
-  $('#pBody').innerHTML = `<div class="ov-card inline"><div class="ov-ico">${win ? '🏆' : '🙂'}</div><h3>${win ? 'THÀNH CÔNG!' : 'Cố lên lần sau!'}</h3><p>Điểm: <b>${P.score}</b> · Combo cao nhất: <b>x${P.maxMul}</b> (kỷ lục ${S.pearl.best})</p><p>Tiền thưởng: <b class="money">+${fmtK(money)}</b></p><div class="prws">${rw}</div>${extra}<button class="btn pri block" data-act="x">Nhận thưởng 🎁</button></div>`;
+  $('#pBody').innerHTML = `<div class="ov-card inline"><div class="ov-ico">${win ? '🏆' : '🙂'}</div><h3>${win ? 'THÀNH CÔNG!' : 'Cố lên lần sau!'}</h3><p>Điểm: <b>${P.score}</b> · Combo cao nhất: <b>x${P.maxMul}</b> (kỷ lục ${S.pearl.best})</p><p>Tiền thưởng: <b class="money">+${fmtK(money)}</b></p><div class="prws">${rw}</div>${extra}${rewardedReady() && (money > 0 || rewards.length) ? '<button class="btn ghost block" data-act="p2">🎬 Xem quảng cáo · nhân đôi thưởng</button>' : ''}<button class="btn pri block" data-act="x">Nhận thưởng 🎁</button></div>`;
 }
 export function openPearl() {
-  if (S.pearl.playsDay >= 3) return toast('Hôm nay bạn đã chơi đủ 3 lượt Trân Châu Nổ', 'err');
+  if (S.pearl.playsDay >= 3) {
+    if (rewardedReady()) {
+      return showRewarded(() => { S.pearl.playsDay = Math.max(0, S.pearl.playsDay - 1); S.pearl.adPlays = (S.pearl.adPlays || 0) + 1; requestSave(); markDirty('panel'); openPearl(); });
+    }
+    return toast('Hôm nay bạn đã chơi đủ 3 lượt Trân Châu Nổ', 'err');
+  }
   const m = openModal({ id: 'pearl', cls: 'pearl-modal', onClose: () => { if (P?.timer) clearInterval(P.timer); P = null; }, html: `<div id="pBody"><h3 class="m-title">✨ Trân Châu Nổ</h3><div class="pearl-preview">${PIDS.map((_, i) => pearlIcon(i)).join('')}</div><p class="m-text center">Chạm nhóm ≥ 2 trân châu cùng màu kề nhau để làm nổ. Nhóm càng lớn điểm càng cao, nổ liên tiếp trong ${PCOMBO_MS / 1000}s = nhân combo! Mục tiêu <b>${PGOAL}</b> điểm trong ${PDUR} giây. Cuối ván nhận thêm trân châu nguyên liệu cho kho.</p><p class="m-text center muted">Lượt hôm nay: ${S.pearl.playsDay}/3 · Kỷ lục: ${S.pearl.best}</p><button class="btn pri block" data-act="start">▶ Bắt đầu</button></div>` });
   bindActions(m.body, {
-    x: () => m.close(),
+    x: () => { const ended = !!(P && P.over); m.close(); if (ended) maybeInterstitial('game'); },
+    p2: () => showRewarded(() => {
+      if (!P || !P.last || P.doubled) return;
+      P.doubled = true;
+      S.money += P.last.money; for (const [id, q] of P.last.rewards) E.addStock(id, q);
+      markDirty('hud', 'panel'); requestSave(); sfx('coin');
+      const b = $('[data-act="p2"]', m.body); if (b) b.remove();
+      toast('Đã nhân đôi thưởng! 🎉', 'ok');
+    }),
     start: () => {
       if (P && !P.over) return;
       S.pearl.playsDay++;
