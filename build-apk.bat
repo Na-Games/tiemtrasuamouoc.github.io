@@ -1,35 +1,88 @@
+
 @echo off
-REM Dong goi game thanh APK Android (Capacitor). Lan dau tu cai Node.js 22+, JDK 21, Android SDK.
-REM Dung:  build-apk.bat                  -> hien menu
-REM        build-apk.bat debug|install|release|aab [tham so them cho apk\build-apk.ps1]
-REM Vi du: build-apk.bat release -VersionCode 2 -VersionName 1.1
-REM        build-apk.bat aab -VersionCode 2 -VersionName 1.1   (file .aab de len Google Play)
-REM        build-apk.bat debug -Clean         (tao lai project Android tu dau)
-REM Project APK nam o thu muc ..\tiemtra-apk (canh thu muc game).
-setlocal
+setlocal EnableExtensions
 cd /d "%~dp0"
+
+REM Build game Tiem Tra Mo Uoc
+REM Che do: debug, install, release, aab
+
 set "MODE=%~1"
-if not "%MODE%"=="" goto run
-echo.
-echo   TIEM TRA MO UOC - BUILD APK
-echo   1. APK debug (choi thu)
-echo   2. APK debug + cai len dien thoai qua USB
-echo   3. APK release (da ky, de cai truc tiep)
-echo   4. AAB release (da ky, de TAI LEN GOOGLE PLAY)
-echo.
-choice /c 1234 /n /m "Chon [1-4]: "
-set "MODE=debug"
-if errorlevel 2 set "MODE=install"
-if errorlevel 3 set "MODE=release"
-if errorlevel 4 set "MODE=aab"
-:run
+
+if not defined MODE (
+    echo.
+    echo ==========================================
+    echo       TIEM TRA MO UOC - BUILD APK
+    echo ==========================================
+    echo 1. APK debug (choi thu)
+    echo 2. APK debug + cai qua USB
+    echo 3. APK release (da ky)
+    echo 4. AAB release (tai len Google Play)
+    echo.
+
+    choice /c 1234 /n /m "Chon [1-4]: "
+
+    if errorlevel 4 (
+        set "MODE=aab"
+    ) else if errorlevel 3 (
+        set "MODE=release"
+    ) else if errorlevel 2 (
+        set "MODE=install"
+    ) else (
+        set "MODE=debug"
+    )
+)
+
 set "FLAGS="
+
 if /i "%MODE%"=="install" set "FLAGS=-Install"
 if /i "%MODE%"=="release" set "FLAGS=-Release"
 if /i "%MODE%"=="aab" set "FLAGS=-Aab"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0apk\build-apk.ps1" %FLAGS% %2 %3 %4 %5 %6 %7 %8 %9
-set "RC=%errorlevel%"
+
+REM Khi chon AAB, yeu cau nhap version
+if /i "%MODE%"=="aab" (
+    echo.
+    echo ==========================================
+    echo        NHAP PHIEN BAN GOOGLE PLAY
+    echo ==========================================
+
+    :inputVersionCode
+    set /p "VERSION_CODE=Nhap versionCode (VD: 4): "
+
+    echo(%VERSION_CODE%| findstr /r "^[1-9][0-9]*$" >nul
+    if errorlevel 1 (
+        echo versionCode phai la so nguyen duong.
+        goto inputVersionCode
+    )
+
+    :inputVersionName
+    set /p "VERSION_NAME=Nhap versionName (VD: 1.1): "
+
+    if not defined VERSION_NAME (
+        echo versionName khong duoc de trong.
+        goto inputVersionName
+    )
+
+    echo.
+    echo versionCode = %VERSION_CODE%
+    echo versionName = %VERSION_NAME%
+
+    set "FLAGS=-Aab -VersionCode %VERSION_CODE% -VersionName %VERSION_NAME%"
+)
+
 echo.
-if not "%RC%"=="0" echo BUILD APK LOI - xem thong bao mau do phia tren.
+echo ==> Bat dau build: %MODE%
+echo.
+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0apk\build-apk.ps1" %FLAGS% %2 %3 %4 %5 %6 %7 %8 %9
+
+set "RC=%errorlevel%"
+
+echo.
+if not "%RC%"=="0" (
+    echo BUILD THAT BAI - Kiem tra loi phia tren.
+) else (
+    echo BUILD HOAN TAT!
+)
+
 pause
 exit /b %RC%
